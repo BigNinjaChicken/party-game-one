@@ -10,12 +10,50 @@
 	// Generate a random name when the component loads
 	generateRandomName();
 
-	import { io } from "socket.io-client";
+	import { onMount, onDestroy } from "svelte";
+	import { writable } from "svelte/store";
 
-	const socket = io();
+	const ws = new WebSocket("ws://localhost:8080");
 
-	socket.on("eventFromServer", (message) => {
-		console.log(message);
+	const message = writable("");
+
+	ws.onopen = () => {
+		console.log("Connected to WebSocket server");
+	};
+
+	ws.onmessage = (event) => {
+		message.set(event.data);
+	};
+
+	ws.onclose = () => {
+		console.log("Disconnected from WebSocket server");
+	};
+
+	let inputMessage = "";
+
+	const sendMessage = () => {
+		if (inputMessage.trim() !== "") {
+			ws.send(inputMessage);
+			inputMessage = "";
+		}
+	};
+
+	onMount(() => {
+		ws.onopen = () => {
+			console.log("Connected to WebSocket server");
+		};
+
+		ws.onmessage = (event) => {
+			message.set(event.data);
+		};
+
+		ws.onclose = () => {
+			console.log("Disconnected from WebSocket server");
+		};
+	});
+
+	onDestroy(() => {
+		ws.close();
 	});
 </script>
 
