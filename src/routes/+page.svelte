@@ -10,51 +10,53 @@
 	// Generate a random name when the component loads
 	generateRandomName();
 
-	import { onMount, onDestroy } from "svelte";
-	import { writable } from "svelte/store";
+	import { onMount } from "svelte";
 
-	const ws = new WebSocket("ws://localhost:8080");
-
-	const message = writable("");
-
-	ws.onopen = () => {
-		console.log("Connected to WebSocket server");
-	};
-
-	ws.onmessage = (event) => {
-		message.set(event.data);
-	};
-
-	ws.onclose = () => {
-		console.log("Disconnected from WebSocket server");
-	};
-
-	let inputMessage = "";
-
-	const sendMessage = () => {
-		if (inputMessage.trim() !== "") {
-			ws.send(inputMessage);
-			inputMessage = "";
-		}
-	};
+	let socket: WebSocket;
+	let message = "";
 
 	onMount(() => {
-		ws.onopen = () => {
-			console.log("Connected to WebSocket server");
+		socket = new WebSocket("ws://localhost:8080"); // Change the URL as needed
+
+		socket.onopen = (event) => {
+			console.log("WebSocket connection opened", event);
 		};
 
-		ws.onmessage = (event) => {
-			message.set(event.data);
+		socket.onmessage = (event) => {
+			console.log("WebSocket message received", event);
+			message = event.data;
 		};
 
-		ws.onclose = () => {
-			console.log("Disconnected from WebSocket server");
+		socket.onclose = (event) => {
+			console.log("WebSocket connection closed", event);
 		};
 	});
 
-	onDestroy(() => {
-		ws.close();
-	});
+	let joinText = "Join";
+	let lobbyCode: string = "";
+	let playerName: string = "";
+
+	function joinLobby() {
+		joinText = "Joining Lobby...";
+
+		// Get the lobbyCode and playerName from the input fields
+		const enteredLobbyCode = lobbyCode.trim();
+		const enteredPlayerName = playerName.trim();
+
+		// Check if lobbyCode and playerName are not empty
+		if (enteredLobbyCode && enteredPlayerName) {
+			console.log("Lobby Code:", enteredLobbyCode);
+			console.log("Player Name:", enteredPlayerName);
+
+			const data = {
+				lobbyCode: enteredLobbyCode,
+				playerName: enteredPlayerName,
+			};
+			socket.send(JSON.stringify(data));
+		} else {
+			console.log("Please enter a valid Lobby Code and Player Name");
+		}
+	}
 </script>
 
 <svelte:head>
@@ -82,6 +84,7 @@
 							type="text"
 							id="input1"
 							placeholder="ABCD"
+							bind:value={lobbyCode}
 						/>
 					</div>
 				</div>
@@ -93,10 +96,14 @@
 							type="text"
 							id="input2"
 							placeholder={randomName}
+							bind:value={playerName}
 						/>
 					</div>
 				</div>
-				<button class="button is-primary is-fullwidth">Join</button>
+				<button
+					class="button is-primary is-fullwidth"
+					on:click={joinLobby}>{joinText}</button
+				>
 			</div>
 		</div>
 	</div>

@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 
 import { handler } from './build/handler.js';
 
-const port = process.env.PORT || 8080; 
+const port = process.env.PORT || 8080;
 const app = express();
 const server = createServer(app);
 
@@ -32,7 +32,7 @@ wss.on('connection', (ws) => {
   // send a message to all connected clients upon receiving a message from one of the connected clients
   ws.on('message', (data) => {
     console.log(`received: ${data}`);
-    serverBroadcast(`Client ${clients.get(ws)} ${data}`);
+    serverBroadcast(clients.get(ws), data);
   });
 
   // stop tracking the client upon that client closing the connection
@@ -45,14 +45,18 @@ wss.on('connection', (ws) => {
   ws.send(`You have been assigned id ${id}`);
 });
 
-// function for sending a message to every connected client
-function serverBroadcast(message) {
+function serverBroadcast(clientID, message) {
+  // Convert the message object to a JSON string
+  const messageJSON = JSON.parse(message);
+  messageJSON.clientID = clientID;
+
+  // Broadcast the JSON string to all connected clients
   wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
+    client.send(JSON.stringify(messageJSON));
+    console.log(`broadcasted: ${messageJSON}`)
   });
 }
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
