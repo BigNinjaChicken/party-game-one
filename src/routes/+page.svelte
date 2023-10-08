@@ -24,7 +24,7 @@
 	let errorText: string = ""; // Add errorText variable for error handling
 
 	onMount(async () => {
-		socket = new WebSocket("wss://partygame-399004.uk.r.appspot.com"); 
+		socket = new WebSocket("ws://localhost:8080"); 
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
 

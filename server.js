@@ -5,11 +5,10 @@ import { WebSocketServer } from 'ws';
 import { randomUUID } from 'crypto';
 
 import { handler } from './build/handler.js';
-import { resolve } from 'path';
 
+const port = process.env.PORT || 8080;
 const app = express();
 const server = createServer(app);
-const port = process.env.PORT || 8080;
 
 const io = new Server(server);
 
@@ -19,7 +18,7 @@ io.on('connection', (socket) => {
 
 app.use(handler);
 
-const wss = new WebSocketServer({ noServer: true });
+const wss = new WebSocketServer({ server }); 
 
 const clients = new Map();
 const sessions = new Map();
