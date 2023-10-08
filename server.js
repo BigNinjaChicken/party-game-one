@@ -5,10 +5,11 @@ import { WebSocketServer } from 'ws';
 import { randomUUID } from 'crypto';
 
 import { handler } from './build/handler.js';
+import { resolve } from 'path';
 
-const port = process.env.PORT || 8080;
 const app = express();
 const server = createServer(app);
+const port = process.env.PORT || 8080;
 
 const io = new Server(server);
 
@@ -18,43 +19,126 @@ io.on('connection', (socket) => {
 
 app.use(handler);
 
-const wss = new WebSocketServer({ server }); // Use the existing HTTP server for WebSocket
+const wss = new WebSocketServer({ noServer: true });
 
-const clients = new Map(); // has to be a Map instead of {} due to non-string keys
+const clients = new Map();
+const sessions = new Map();
 
-// set up event handlers and do other things upon a client connecting to the server
 wss.on('connection', (ws) => {
-  // create an id to track the client
-  const id = randomUUID();
-  clients.set(ws, id);
-  console.log(`new connection assigned id: ${id}`);
+  // Store client information with the WebSocket connection
+  const clientId = randomUUID();
+  const clientInfo = {
+    clientType: "",
+    sessionCode: "",
+    playerName: "",
+    clientId: clientId
+  };
 
-  // send a message to all connected clients upon receiving a message from one of the connected clients
+  // Store the clientInfo object with the WebSocket connection
+  clients.set(ws, clientInfo);
+  console.log(`New connection.`);
+
   ws.on('message', (data) => {
-    console.log(`received: ${data}`);
-    serverBroadcast(clients.get(ws), data);
+    console.log(`Received: ${data}`);
+
+    const messageJSON = JSON.parse(data);
+    const clientInfo = clients.get(ws);
+
+    // Once in session send messages back and forth
+    if (sessions.has(clientInfo.sessionCode)) {
+      if (clientInfo.clientType === "Unreal") {
+        const allSessionUsers = sessions.get(clientInfo.sessionCode);
+        for (const sessionUser of allSessionUsers) {
+          if (clients.get(sessionUser).clientType === "Web") {
+            if (messageJSON.clientId) {
+              if (clients.get(sessionUser).clientId == messageJSON.clientId) // if Unreal wants to do a user specific call
+                sessionUser.send(JSON.stringify(messageJSON));
+            } else {
+              sessionUser.send(JSON.stringify(messageJSON));
+            }
+          }
+        }
+      } else if (clientInfo.clientType === "Web") {
+        const allSessionUsers = sessions.get(clientInfo.sessionCode);
+        for (const sessionUser of allSessionUsers) {
+          if (clients.get(sessionUser).clientType === "Unreal") {
+            messageJSON.clientInfo = clients.get(ws);
+            sessionUser.send(JSON.stringify(messageJSON));
+            break; // Only 1 Unreal User
+          }
+        }
+      }
+      return;
+    }
+
+    // Set client type
+    if (messageJSON.clientType && clientInfo.clientType === "") {
+      clientInfo.clientType = messageJSON.clientType;
+      console.log(`Client type updated to: ${clientInfo.clientType}`);
+      return;
+    }
+
+    // Create a session
+    if (messageJSON.gameType) {
+      if (clientInfo.clientType === "Unreal") {
+        const sessionCode = generateRandomCode(4);
+
+        sessions.set(sessionCode, []);
+        sessions.get(sessionCode).push(ws);
+        clientInfo.sessionCode = sessionCode;
+
+        const sessionData = {
+          sessionCode: sessionCode
+        };
+        ws.send(JSON.stringify(sessionData));
+        console.log("Created Session");
+      }
+      return;
+    }
+
+    // Join a session
+    if (messageJSON.bJoinGame && clientInfo.clientType === "Web") {
+      const sessionCodeToJoin = messageJSON.sessionCode;
+
+      if (sessions.has(sessionCodeToJoin)) {
+        const response = {
+          bValidSession: true,
+        };
+        ws.send(JSON.stringify(response));
+        clientInfo.sessionCode = sessionCodeToJoin;
+        clientInfo.playerName = messageJSON.playerName;
+
+        sessions.get(sessionCodeToJoin).push(ws);
+        console.log(`Web client joined session: ${sessionCodeToJoin}`);
+      } else {
+        const response = {
+          bValidSession: false
+        };
+        ws.send(JSON.stringify(response));
+        console.log("Invalid Room");
+      }
+      return;
+    }
   });
 
-  // stop tracking the client upon that client closing the connection
+  // Stop tracking the client upon that client closing the connection
   ws.on('close', () => {
-    console.log(`connection (id = ${clients.get(ws)}) closed`);
+    console.log(`Connection closed`);
+    sessions.delete(ws);
     clients.delete(ws);
   });
-
-  // send the id back to the newly connected client
-  ws.send(`You have been assigned id ${id}`);
 });
 
-function serverBroadcast(clientID, message) {
-  // Convert the message object to a JSON string
-  const messageJSON = JSON.parse(message);
-  messageJSON.clientID = clientID;
+function generateRandomCode(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
-  // Broadcast the JSON string to all connected clients
-  wss.clients.forEach((client) => {
-    client.send(JSON.stringify(messageJSON));
-    console.log(`broadcasted: ${messageJSON}`)
-  });
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
 }
 
 
