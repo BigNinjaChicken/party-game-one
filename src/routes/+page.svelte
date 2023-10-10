@@ -24,7 +24,11 @@
 	let errorText: string = ""; // Add errorText variable for error handling
 
 	onMount(async () => {
-		socket = new WebSocket("ws://localhost:8080"); 
+		if (process.env.PORT) {
+			socket = new WebSocket(`ws://localhost:${process.env.PORT}`); 
+		} else {
+			socket = new WebSocket("ws://localhost:8080"); 
+		}
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
 
