@@ -17,22 +17,39 @@
         bHasSubmitted = true;
     }
 
-    $: prompts = receivedData ? Object.keys(receivedData)
-        .filter(key => key.startsWith('promptFragmentOne'))
-        .map(key => {
-            const index = key.slice(-1);
-            return {
-                promptOne: receivedData[`promptFragmentOne${index}`],
-                promptOneResponse: receivedData[`PromptFragmentOneResponce${index}`],
-                promptTwo: receivedData[`promptFragmentTwo${index}`],
-                promptTwoResponse: receivedData[`PromptFragmentTwoResponceKey${index}`],
-            };
-        })
-        .filter((prompt, index, self) => {
-            // Filter out duplicates based on promptOne and promptTwo
-            const firstOccurrence = self.findIndex(p => p.promptOne === prompt.promptOne && p.promptTwo === prompt.promptTwo);
-            return index === firstOccurrence;
-        }) : [];
+    type Prompt = {
+        promptOne: string;
+        promptOneResponse: string;
+        promptOnePlayerId: string;
+        promptTwo: string;
+        promptTwoResponse: string;
+        promptTwoPlayerId: string;
+    };
+
+    let prompts: Prompt[] = [];
+
+    let i = 0;
+    while (true) {
+        const promptOneKey = `promptFragmentOne${i}`;
+        const promptTwoKey = `promptFragmentTwo${i}`;
+
+        // Check if the promptOneKey exists in receivedData
+        if (!(promptOneKey in receivedData)) {
+            break; // Exit the loop if the key is invalid
+        }
+
+        // Create a new Prompt object based on the keys and values
+        prompts.push({
+            promptOne: receivedData[promptOneKey],
+            promptOneResponse: receivedData[`promptFragmentOneResponce${i}`],
+            promptOnePlayerId: receivedData[`promptFragmentOnePlayerId${i}`],
+            promptTwo: receivedData[promptTwoKey],
+            promptTwoResponse: receivedData[`promptFragmentTwoResponce${i}`],
+            promptTwoPlayerId: receivedData[`promptFragmentTwoPlayerId${i}`],
+        });
+
+        i++;
+    }
 
     socket.onmessage = async (event: any) => {
         console.log("WebSocket message received", event);
@@ -53,7 +70,12 @@
                         class:selected={selectedOption === `Option${i + 1}`}
                         on:click={() => selectOption(i)}
                     >
-                        <p>{prompt.promptOne} {prompt.promptOneResponse} {prompt.promptTwo} {prompt.promptTwoResponse}</p>
+                        <p>
+                            {prompt.promptOne}
+                            {prompt.promptOneResponse}
+                            {prompt.promptTwo}
+                            {prompt.promptTwoResponse}
+                        </p>
                     </button>
                 {/each}
             </div>

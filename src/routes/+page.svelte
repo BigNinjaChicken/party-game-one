@@ -22,12 +22,9 @@
 	let errorText: string = ""; // Add errorText variable for error handling
 
 	onMount(async () => {
-		// if (process.env.PORT) {
-		// 	socket = new WebSocket(`ws://localhost:${process.env.PORT}`); 
-		// } else {
-		// 	socket = new WebSocket("ws://localhost:8080"); 
-		// }
-		socket = new WebSocket("wss://party-game-web-service.onrender.com"); 
+		socket = new WebSocket("ws://localhost:8080");
+		// socket = new WebSocket("wss://party-game-web-service.onrender.com");
+
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
 
@@ -104,16 +101,16 @@
 	}
 
 	function limitInput(event: Event) {
-        const inputElement = event.currentTarget as HTMLInputElement;
-        let value = inputElement.value;
+		const inputElement = event.currentTarget as HTMLInputElement;
+		let value = inputElement.value;
 		const inputLimit = 18;
 
-        if (value.length > inputLimit) {
-            value = value.slice(0, inputLimit);
-        }
+		if (value.length > inputLimit) {
+			value = value.slice(0, inputLimit);
+		}
 
-        inputElement.value = value;
-    }
+		inputElement.value = value;
+	}
 </script>
 
 <svelte:head>
@@ -157,7 +154,7 @@
 								class="input"
 								type="text"
 								id="input2"
-								placeholder={randomName}	
+								placeholder={randomName}
 								on:keydown={handleKeyDown}
 								on:input={limitInput}
 								bind:value={playerName}
