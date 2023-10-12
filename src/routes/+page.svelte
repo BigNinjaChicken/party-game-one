@@ -22,8 +22,8 @@
 	let errorText: string = ""; // Add errorText variable for error handling
 
 	onMount(async () => {
-		socket = new WebSocket("ws://localhost:8080");
-		// socket = new WebSocket("wss://party-game-web-service.onrender.com");
+		// socket = new WebSocket("ws://localhost:8080");
+		socket = new WebSocket("wss://party-game-web-service.onrender.com");
 
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
