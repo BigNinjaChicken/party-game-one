@@ -128,6 +128,11 @@
                                         placeholder="Enter something"
                                         bind:value={userInputPromptTwo}
                                     />
+                                    <button
+                                        class="button"
+                                        on:click={submitPromptTwo}
+                                        >Submit</button
+                                    >
                                 </div>
                             {:else}
                                 <div class="other-player">Other Player</div>
