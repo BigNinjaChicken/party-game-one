@@ -1,50 +1,97 @@
 <script lang="ts">
     import { onMount } from "svelte";
-	import { fade, slide } from 'svelte/transition';
-    import { quintOut } from 'svelte/easing';
+    import { fade, slide } from "svelte/transition";
+    import { quintOut } from "svelte/easing";
     import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
 
     export let stage: number;
     export let socket: WebSocket;
     export let receivedData: any;
 
-    let valueSingle: string = "books";
+    let players: any[] = [];
+
+    let valueSingle: string = "";
 
     onMount(async () => {
-        if (!socket) {
-            console.log("Invalid Socket");
-            return;
-        }
-
         socket.onmessage = async (event) => {
             console.log("WebSocket message received", event);
             receivedData = JSON.parse(event.data);
-            if (receivedData.Stage) stage++;
+            if (receivedData.Stage) {
+                stage++;
+                return;
+            }
+
+            // Populate the players array from the received data
+            players = [];
+            for (let i = 0; i < 100; i++) {
+                const playerName = receivedData[`PlayerName${i}`];
+                if (playerName == "") break; // Go untill empty player name
+                const playerId = receivedData[`PlayerID${i}`];
+                const playerScoreBonusOption =
+                    receivedData[`PlayerScoreBonusOption${i}`];
+                if (playerName && playerScoreBonusOption) {
+                    players.push({
+                        name: playerName,
+                        scoreBonusOption: playerScoreBonusOption,
+                        id: playerId,
+                    });
+                }
+            }
         };
     });
+
+    function selectPlayer(player: any) {
+        const message = {
+            selectedPlayerId: player.id,
+            multiplier: player.scoreBonusOption,
+        };
+        socket.send(JSON.stringify(message));
+        stage++;
+    }
 </script>
 
-<body data-theme="crimson" transition:slide={{ delay: 250, duration: 300, easing: quintOut, axis: 'x' }}>
+<body
+    data-theme="crimson"
+    transition:slide={{
+        delay: 250,
+        duration: 300,
+        easing: quintOut,
+        axis: "x",
+    }}
+>
     <div class="grid grid-cols-1 gap-4">
         <h1 class="h1">
-            <span class="gradient-heading">Multiplier Round</span>
+            <span class="gradient-heading">Drink Bonus</span>
         </h1>
-        <p class="text-center">Select a player to give the multiplier to:</p>
-        <div class="card p-4">
-            <div class="list-box-container">
-                <ListBox>
-                    <ListBoxItem
-                        class="px-5 m-3"
-                        bind:group={valueSingle}
-                        name="medium"
-                        value="1"
-                    >
-                        <p class="text-base">Player 1</p>
-                        <p class="text-sm text-gray-500">2x</p></ListBoxItem
-                    >
-                </ListBox>
+        {#if players.length > 0}
+            <p class="text-center">
+                Select a player to take a drink and get a multiplier:
+            </p>
+            <div class="card p-4">
+                <div class="list-box-container">
+                    <ListBox>
+                        {#each players as player (player.name)}
+                            <ListBoxItem
+                                class="px-5 m-3"
+                                bind:group={valueSingle}
+                                name="medium"
+                                value={player.name}
+                                on:click={() => selectPlayer(player)}
+                            >
+                                <p class="text-base">{player.name}</p>
+                                <p class="text-sm text-gray-500">
+                                    {player.scoreBonusOption}x
+                                </p>
+                            </ListBoxItem>
+                        {/each}
+                    </ListBox>
+                </div>
             </div>
-        </div>
+        {:else}
+            <p class="text-center">
+                Waiting on other players
+            </p>
+        {/if}
     </div>
 </body>
 

@@ -9,10 +9,13 @@
 	import AllPole from "../lib/game-one/all_pole.svelte";
 	import PointMult from "../lib/game-one/point_mult.svelte";
 
-	let stage: number = 3;
+	let stage: number;
 	let socket: WebSocket;
 	let receivedData = {};
+	let isSocketOpen = false; // Add this flag to track socket status
 	const NODE_ENV = process.env.NODE_ENV;
+
+	stage = 0; // Set the initial stage to 0
 
 	onMount(async () => {
 		if (NODE_ENV == "dev") {
@@ -26,6 +29,7 @@
 
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
+			isSocketOpen = true; // Set the flag to true
 
 			const data = {
 				clientType: "Web",
@@ -42,6 +46,13 @@
 			console.log("WebSocket connection closed", event);
 		};
 	});
+
+	// Watch for changes in isSocketOpen and update the stage accordingly
+	$: {
+		if (isSocketOpen && stage === 0) {
+			stage = 1; // Only change the stage when the socket is open
+		}
+	}
 </script>
 
 <svelte:head>
@@ -53,7 +64,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </svelte:head>
 
-{#if stage == 1}
+{#if stage == 0}
+	<div/>
+{:else if stage == 1}
 	<Login bind:stage {socket} bind:receivedData />
 {:else if stage == 2}
 	<ReadyUp bind:stage {socket} bind:receivedData/>

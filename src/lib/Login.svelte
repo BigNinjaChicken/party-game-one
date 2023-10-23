@@ -22,10 +22,6 @@
     let errorText: string = ""; // Add errorText variable for error handling
 
     onMount(async () => {
-        if (!socket) {
-            return;
-        }
-        
         socket.onmessage = async (event) => {
             console.log("WebSocket message received", event);
             receivedData = JSON.parse(event.data);
