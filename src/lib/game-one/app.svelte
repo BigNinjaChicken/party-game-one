@@ -1,15 +1,20 @@
 <script lang="ts">
-    import Prompt from "./prompt.svelte";
+    import { onMount } from "svelte";
 
+    export let stage: number;
     export let socket: WebSocket;
-    let ShowPromptScreen = false;
-    let receivedData: any;
+    export let receivedData: any;
 
-    socket.onmessage = async (event: any) => {
-        console.log("WebSocket message received", event);
-        receivedData = JSON.parse(event.data);
-        ShowPromptScreen = true;
-    };
+    onMount(async () => {
+        socket.onmessage = async (event: any) => {
+            receivedData = JSON.parse(event.data);
+
+            if (receivedData.Stage == "Tutorial") {
+                console.log("WebSocket message received", event);
+                stage = 3;
+            }
+        };
+    });
 
     const message = {
         bJoinedGame: true,
@@ -27,9 +32,6 @@
     }
 </script>
 
-{#if ShowPromptScreen}
-	<Prompt {receivedData} {socket}/>
-{:else}
 <section class="hero is-primary is-fullheight">
     <div class="hero-body">
         <div class="container has-text-centered">
@@ -45,7 +47,6 @@
         </div>
     </div>
 </section>
-{/if}
 
 <style>
     button.ready {

@@ -1,11 +1,10 @@
 <script lang="ts">
-    import Submitted from "./submitted.svelte";
-
-    export let receivedData: any;
+    export let stage: number;
     export let socket: WebSocket;
+    export let receivedData: any;
 
     let selectedOption: string = "";
-    let bHasSubmitted = false;
+    let bUpdate = false;
 
     // Create a function to select an option
     function selectOption(option: number) {
@@ -14,7 +13,8 @@
             option: option,
         };
         socket.send(JSON.stringify(jsonMessage));
-        bHasSubmitted = true;
+
+        stage++;
     }
 
     type Prompt = {
@@ -28,42 +28,45 @@
 
     let prompts: Prompt[] = [];
 
-    let i = 0;
-    while (true) {
-        const promptOneKey = `promptFragmentOne${i}`;
-        const promptTwoKey = `promptFragmentTwo${i}`;
-
-        // Check if the promptOneKey exists in receivedData
-        if (!(promptOneKey in receivedData)) {
-            break; // Exit the loop if the key is invalid
-        }
-
-        // Create a new Prompt object based on the keys and values
-        prompts.push({
-            promptOne: receivedData[promptOneKey],
-            promptOneResponse: receivedData[`promptFragmentOneResponce${i}`],
-            promptOnePlayerId: receivedData[`promptFragmentOnePlayerId${i}`],
-            promptTwo: receivedData[promptTwoKey],
-            promptTwoResponse: receivedData[`promptFragmentTwoResponce${i}`],
-            promptTwoPlayerId: receivedData[`promptFragmentTwoPlayerId${i}`],
-        });
-
-        i++;
-    }
-
     socket.onmessage = async (event: any) => {
         console.log("WebSocket message received", event);
         receivedData = JSON.parse(event.data);
+
+        let i = 0;
+        while (true) {
+            const promptOneKey = `promptFragmentOne${i}`;
+            const promptTwoKey = `promptFragmentTwo${i}`;
+
+            // Check if the promptOneKey exists in receivedData
+            if (!(promptOneKey in receivedData)) {
+                break; // Exit the loop if the key is invalid
+            }
+
+            // Create a new Prompt object based on the keys and values
+            prompts.push({
+                promptOne: receivedData[promptOneKey],
+                promptOneResponse:
+                    receivedData[`promptFragmentOneResponce${i}`],
+                promptOnePlayerId:
+                    receivedData[`promptFragmentOnePlayerId${i}`],
+                promptTwo: receivedData[promptTwoKey],
+                promptTwoResponse:
+                    receivedData[`promptFragmentTwoResponce${i}`],
+                promptTwoPlayerId:
+                    receivedData[`promptFragmentTwoPlayerId${i}`],
+            });
+
+            i++;
+        }
+        bUpdate = true;
     };
 </script>
 
-{#if bHasSubmitted}
-    <Submitted />
-{:else}
-    <main class="section">
-        <div class="container">
-            <h1 class="title">Poll Screen</h1>
-            <div class="buttons">
+<main class="section">
+    <div class="container">
+        <h1 class="title">Poll Screen</h1>
+        <div class="buttons">
+            {#if bUpdate}
                 {#each prompts as prompt, i}
                     <button
                         class="button"
@@ -78,7 +81,7 @@
                         </p>
                     </button>
                 {/each}
-            </div>
+            {/if}
         </div>
-    </main>
-{/if}
+    </div>
+</main>

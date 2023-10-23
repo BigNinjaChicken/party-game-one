@@ -1,29 +1,28 @@
 <script lang="ts">
-	import "bulma/css/bulma.css";
 	import { onMount } from "svelte";
 
-	let randomName: string;
-	let GameScreen: any; // Declare GameScreen before onMount
+	import Login from "../lib/Login.svelte";
+	import ReadyUp from "../lib/game-one/app.svelte";
+	import Prompt from "../lib/game-one/prompt.svelte";
+	import Submitted from "../lib/game-one/submitted.svelte";
+	import Pole from "../lib/game-one/pole.svelte";
+	import AllPole from "../lib/game-one/all_pole.svelte";
+	import PointMult from "../lib/game-one/point_mult.svelte";
 
-	const generateRandomName = () => {
-		const names = ["Frazier", "Tom"];
-		const randomIndex = Math.floor(Math.random() * names.length);
-		randomName = names[randomIndex];
-	};
-
-	// Generate a random name when the component loads
-	generateRandomName();
-
+	let stage: number = 3;
 	let socket: WebSocket;
-	let message = "";
-	let joinText = "Join";
-	let lobbyCode: string = "";
-	let playerName: string = "";
-	let errorText: string = ""; // Add errorText variable for error handling
+	let receivedData = {};
+	const NODE_ENV = process.env.NODE_ENV;
 
 	onMount(async () => {
-		// socket = new WebSocket("ws://localhost:8080");
-		socket = new WebSocket("wss://party-game-web-service.onrender.com");
+		if (NODE_ENV == "dev") {
+			socket = new WebSocket("ws://localhost:8080");
+		} else if (NODE_ENV == "prod") {
+			socket = new WebSocket("wss://party-game-web-service.onrender.com");
+		} else {
+			console.log("Invalid NODE_ENV");
+			return;
+		}
 
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
@@ -35,82 +34,14 @@
 		};
 
 		socket.onmessage = async (event) => {
-			if (GameScreen) {
-				return;
-			}
-
 			console.log("WebSocket message received", event);
-			const receivedData = JSON.parse(event.data);
-
-			// Load Game Screen
-			if (receivedData.bValidSession) {
-				if (receivedData.bValidSession == true) {
-					GameScreen = (await import("../lib/game-one/app.svelte"))
-						.default;
-				} else {
-					errorText = "Invalid code entered."; // Provide user feedback for invalid code
-					joinText = "Join";
-				}
-			}
+			receivedData = JSON.parse(event.data);
 		};
 
 		socket.onclose = (event) => {
 			console.log("WebSocket connection closed", event);
 		};
 	});
-
-	async function joinLobby() {
-		// Get the lobbyCode and playerName from the input fields
-		const enteredLobbyCode = lobbyCode.trim();
-		const enteredPlayerName = playerName.trim();
-
-		// Check if lobbyCode and playerName are not empty
-		if (enteredLobbyCode && enteredPlayerName) {
-			console.log("Lobby Code:", enteredLobbyCode);
-			console.log("Player Name:", enteredPlayerName);
-
-			const data = {
-				bJoinGame: true,
-				sessionCode: enteredLobbyCode,
-				playerName: enteredPlayerName,
-			};
-			socket.send(JSON.stringify(data));
-			joinText = "Joining Lobby...";
-		} else {
-			errorText = "Please enter a valid Lobby Code and Player Name";
-			joinText = "Join";
-		}
-	}
-
-	function handleKeyDown(event: KeyboardEvent) {
-		if (event.key === "Enter") {
-			joinLobby();
-		}
-	}
-
-	function convertToUpperCase(event: Event) {
-		const inputElement = event.currentTarget as HTMLInputElement;
-		let value = inputElement.value.toUpperCase();
-
-		// Limit the input to 4 characters
-		if (value.length > 4) {
-			value = value.slice(0, 4);
-		}
-
-		inputElement.value = value;
-	}
-
-	function limitInput(event: Event) {
-		const inputElement = event.currentTarget as HTMLInputElement;
-		let value = inputElement.value;
-		const inputLimit = 18;
-
-		if (value.length > inputLimit) {
-			value = value.slice(0, inputLimit);
-		}
-
-		inputElement.value = value;
-	}
 </script>
 
 <svelte:head>
@@ -122,76 +53,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </svelte:head>
 
-{#if GameScreen}
-	<svelte:component this={GameScreen} {socket} />
+{#if stage == 1}
+	<Login bind:stage {socket} bind:receivedData />
+{:else if stage == 2}
+	<ReadyUp bind:stage {socket} bind:receivedData/>
+{:else if stage == 3}
+	<Submitted bind:stage {socket} bind:receivedData />
+{:else if stage == 4}
+	<Prompt bind:stage {socket} bind:receivedData />
+{:else if stage == 5}
+	<Submitted bind:stage {socket} bind:receivedData />
+{:else if stage == 6}
+	<Pole bind:stage {socket} bind:receivedData />
+{:else if stage == 7}
+	<AllPole bind:stage {socket} bind:receivedData />
+{:else if stage == 8}
+	<Submitted bind:stage {socket} bind:receivedData />
+{:else if stage == 9}
+	<PointMult bind:stage {socket} bind:receivedData />
 {:else}
-	<section class="hero is-fullheight mx-7 background">
-		<div class="hero-body has-text-centered">
-			<div class="container">
-				<div
-					class="box has-shadow"
-					style="max-width: 400px; margin: 0 auto; padding: 20px;"
-				>
-					<h1 class="title is-4">AlcyBox Join Menu</h1>
-					<div class="field">
-						<label class="label" for="input1">Lobby Code</label>
-						<div class="control">
-							<input
-								class="input"
-								type="text"
-								id="input1"
-								placeholder="ABCD"
-								on:keydown={handleKeyDown}
-								on:input={convertToUpperCase}
-								bind:value={lobbyCode}
-							/>
-						</div>
-					</div>
-					<div class="field">
-						<label class="label" for="input2">Name</label>
-						<div class="control">
-							<input
-								class="input"
-								type="text"
-								id="input2"
-								placeholder={randomName}
-								on:keydown={handleKeyDown}
-								on:input={limitInput}
-								bind:value={playerName}
-							/>
-						</div>
-					</div>
-					<button
-						class="button is-primary is-fullwidth"
-						on:click={joinLobby}>{joinText}</button
-					>
-					{#if errorText}
-						<p class="has-text-danger">{errorText}</p>
-					{/if}
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<style>
-		.background {
-			background: linear-gradient(
-				to bottom right,
-				rgb(100, 236, 223),
-				rgb(221, 0, 223)
-			);
-			background-size: 200% 200%;
-			animation: rotateGradient 10s linear infinite;
-		}
-
-		@keyframes rotateGradient {
-			0%,
-			100% {
-				background-position: 0% 0%;
-			}
-			50% {
-				background-position: 100% 100%;
-			}
-		}
-	</style>
+	<h1>Error</h1>
 {/if}
