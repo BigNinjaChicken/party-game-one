@@ -46,7 +46,6 @@
             multiplier: player.scoreBonusOption,
         };
         socket.send(JSON.stringify(message));
-        stage++;
     }
 </script>
 
@@ -60,8 +59,8 @@
     }}
 >
     <div class="grid grid-cols-1 gap-4">
-        <h1 class="h1">
-            <span class="gradient-heading">Drink Bonus</span>
+        <h1 class="h1 text-center">
+            <span class="gradient-heading text-center">Drink Bonus</span>
         </h1>
         {#if players.length > 0}
             <p class="text-center">

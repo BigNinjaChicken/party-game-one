@@ -65,15 +65,15 @@
 </svelte:head>
 
 {#if stage == 0}
-	<div/>
+	<div />
 {:else if stage == 1}
-	<Login bind:stage {socket} bind:receivedData />
+	<Login bind:stage {socket} bind:receivedData /> <!-- Login -->
 {:else if stage == 2}
-	<ReadyUp bind:stage {socket} bind:receivedData/>
+	<ReadyUp bind:stage {socket} bind:receivedData />
 {:else if stage == 3}
-	<Submitted bind:stage {socket} bind:receivedData />
+	<Submitted bind:stage {socket} bind:receivedData /> <!-- Tutorial -->
 {:else if stage == 4}
-	<Prompt bind:stage {socket} bind:receivedData />
+	<Prompt bind:stage {socket} bind:receivedData /> <!-- Act 1 -->
 {:else if stage == 5}
 	<Submitted bind:stage {socket} bind:receivedData />
 {:else if stage == 6}
@@ -83,7 +83,19 @@
 {:else if stage == 8}
 	<Submitted bind:stage {socket} bind:receivedData />
 {:else if stage == 9}
-	<PointMult bind:stage {socket} bind:receivedData />
+	<PointMult bind:stage {socket} bind:receivedData /> <!-- Drinking Bonus -->
+{:else if stage == 10}
+	<Prompt bind:stage {socket} bind:receivedData /> <!-- Act 2 -->
+{:else if stage == 11}
+	<Submitted bind:stage {socket} bind:receivedData />
+{:else if stage == 12}
+	<Pole bind:stage {socket} bind:receivedData />
+{:else if stage == 13}
+	<AllPole bind:stage {socket} bind:receivedData />
+{:else if stage == 14}
+	<Submitted bind:stage {socket} bind:receivedData />
+{:else if stage == 15}
+	<PointMult bind:stage {socket} bind:receivedData /> <!-- Drinking Bonus -->
 {:else}
 	<h1>Error</h1>
 {/if}
