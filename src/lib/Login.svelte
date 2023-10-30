@@ -8,7 +8,7 @@
     export let receivedData: any;
 
     const generateRandomName = () => {
-        const names = ["Frazier", "Tom"];
+        const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan"];
         const randomIndex = Math.floor(Math.random() * names.length);
         randomName = names[randomIndex];
     };

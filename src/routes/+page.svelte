@@ -8,6 +8,8 @@
 	import Pole from "../lib/game-one/pole.svelte";
 	import AllPole from "../lib/game-one/all_pole.svelte";
 	import PointMult from "../lib/game-one/point_mult.svelte";
+	import PromptAct3 from "../lib/game-one/prompt_act_3.svelte";
+	import Restart from "../lib/game-one/restart.svelte";
 
 	let stage: number;
 	let socket: WebSocket;
@@ -96,6 +98,16 @@
 	<Submitted bind:stage {socket} bind:receivedData />
 {:else if stage == 15}
 	<PointMult bind:stage {socket} bind:receivedData /> <!-- Drinking Bonus -->
+{:else if stage == 16}
+	<PromptAct3 bind:stage {socket} bind:receivedData /> <!-- Act 3 -->
+{:else if stage == 17}
+	<Submitted bind:stage {socket} bind:receivedData />
+{:else if stage == 18}
+	<Pole bind:stage {socket} bind:receivedData />
+{:else if stage == 19}
+	<AllPole bind:stage {socket} bind:receivedData />
+{:else if stage == 20}
+	<Submitted bind:stage {socket} bind:receivedData />
 {:else}
-	<h1>Error</h1>
+	<Restart bind:stage {socket} bind:receivedData />
 {/if}
