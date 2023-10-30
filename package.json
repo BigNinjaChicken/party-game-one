@@ -4,7 +4,6 @@
   "scripts": {
     "start": "node server.js",
     "start:dev": "cross-env NODE_ENV=dev npm run build && node server.js",
-    "start:prod": "cross-env NODE_ENV=prod npm run build && node server.js",
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
