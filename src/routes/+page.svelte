@@ -29,6 +29,19 @@
 			return;
 		}
 
+		// Check if the Wake Lock API is supported in the browser
+		if ("wakeLock" in navigator) {
+			// Request a wake lock
+			navigator.wakeLock
+				.request("screen")
+				.then((wakeLock) => {
+					console.log("Wake lock activated!");
+				})
+				.catch((error) => {
+					console.error("Failed to request wake lock:", error);
+				});
+		}
+
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
 			isSocketOpen = true; // Set the flag to true
