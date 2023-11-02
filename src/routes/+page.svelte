@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import NoSleep from "nosleep.js";
 
 	import Login from "$lib/Login.svelte";
 	import ReadyUp from "$lib/game-one/app.svelte";
@@ -29,18 +30,21 @@
 			return;
 		}
 
-		// Check if the Wake Lock API is supported in the browser
-		if ("wakeLock" in navigator) {
-			// Request a wake lock
-			navigator.wakeLock
-				.request("screen")
-				.then((wakeLock) => {
-					console.log("Wake lock activated!");
-				})
-				.catch((error) => {
-					console.error("Failed to request wake lock:", error);
-				});
-		}
+		var noSleep = new NoSleep();
+		// Enable wake lock.
+		// (must be wrapped in a user input event handler e.g. a mouse or touch handler)
+		document.addEventListener(
+			"click",
+			function enableNoSleep() {
+				document.removeEventListener("click", enableNoSleep, false);
+				noSleep.enable();
+			},
+			false
+		);
+
+		// Disable wake lock at some point in the future.
+		// (does not need to be wrapped in any user input event handler)
+		// noSleep.disable();
 
 		socket.onopen = (event) => {
 			console.log("WebSocket connection opened", event);
