@@ -11,6 +11,7 @@
     let players: any[] = [];
 
     let valueSingle: string = "";
+    let hasSelected = false;
 
     onMount(async () => {
         socket.onmessage = async (event) => {
@@ -41,6 +42,7 @@
     });
 
     function selectPlayer(player: any) {
+        hasSelected = true;
         const message = {
             selectedPlayerId: player.id,
             multiplier: player.scoreBonusOption,
@@ -62,7 +64,9 @@
         <h1 class="h1 text-center">
             <span class="gradient-heading text-center">Drink Bonus</span>
         </h1>
-        {#if players.length > 0}
+        {#if hasSelected}
+            <p class="text-center">Waiting on other players</p>
+        {:else if players.length > 0}
             <p class="text-center">
                 Select a player to take a drink and get a multiplier:
             </p>
@@ -87,9 +91,7 @@
                 </div>
             </div>
         {:else}
-            <p class="text-center">
-                Waiting on other players
-            </p>
+            <p class="text-center">Waiting on other players</p>
         {/if}
     </div>
 </body>

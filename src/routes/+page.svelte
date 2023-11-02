@@ -11,14 +11,41 @@
 	import PointMult from "$lib/game-one/point_mult.svelte";
 	import PromptAct3 from "$lib/game-one/prompt_act_3.svelte";
 	import Restart from "$lib/game-one/restart.svelte";
+	import Takeshotready from "$lib/game-one/takeshotready.svelte";
 
 	let stage: number;
 	let socket: WebSocket;
 	let receivedData = {};
-	let isSocketOpen = false; // Add this flag to track socket status
+	let isSocketOpen = false;
 	const NODE_ENV = process.env.NODE_ENV;
 
-	stage = 0; // Set the initial stage to 0
+	const componentList = [
+		Login, // Login
+		ReadyUp,
+		Submitted, // Tutorial
+		Prompt, // Act 1
+		Submitted,
+		Pole,
+		AllPole,
+		Submitted,
+		PointMult, // Drinking Bonus
+		Takeshotready,
+		Prompt, // Act 2
+		Submitted,
+		Pole,
+		AllPole,
+		Submitted,
+		PointMult, // Drinking Bonus
+		Takeshotready,
+		PromptAct3, // Act 3
+		Submitted,
+		Pole,
+		AllPole,
+		Submitted,
+		Restart,
+	];
+
+	stage = 0;
 
 	onMount(async () => {
 		if (NODE_ENV == "dev") {
@@ -31,6 +58,7 @@
 		}
 
 		var noSleep = new NoSleep();
+
 		// Enable wake lock.
 		// (must be wrapped in a user input event handler e.g. a mouse or touch handler)
 		document.addEventListener(
@@ -66,10 +94,9 @@
 		};
 	});
 
-	// Watch for changes in isSocketOpen and update the stage accordingly
 	$: {
 		if (isSocketOpen && stage === 0) {
-			stage = 1; // Only change the stage when the socket is open
+			stage = 1;
 		}
 	}
 </script>
@@ -85,50 +112,13 @@
 
 {#if stage == 0}
 	<div />
-{:else if stage == 1}
-	<Login bind:stage {socket} bind:receivedData /> <!-- Login -->
-{:else if stage == 2}
-	<ReadyUp bind:stage {socket} bind:receivedData />
-{:else if stage == 3}
-	<Submitted bind:stage {socket} bind:receivedData /> <!-- Tutorial -->
-{:else if stage == 4}
-	<Prompt bind:stage {socket} bind:receivedData /> <!-- Act 1 -->
-{:else if stage == 5}
-	<Submitted bind:stage {socket} bind:receivedData />
-{:else if stage == 6}
-	<Pole bind:stage {socket} bind:receivedData />
-{:else if stage == 7}
-	<AllPole bind:stage {socket} bind:receivedData />
-{:else if stage == 8}
-	<Submitted bind:stage {socket} bind:receivedData />
-{:else if stage == 9}
-	<PointMult bind:stage {socket} bind:receivedData />
-	<!-- Drinking Bonus -->
-{:else if stage == 10}
-	<Prompt bind:stage {socket} bind:receivedData /> <!-- Act 2 -->
-{:else if stage == 11}
-	<Submitted bind:stage {socket} bind:receivedData />
-{:else if stage == 12}
-	<Pole bind:stage {socket} bind:receivedData />
-{:else if stage == 13}
-	<AllPole bind:stage {socket} bind:receivedData />
-{:else if stage == 14}
-	<Submitted bind:stage {socket} bind:receivedData />
-{:else if stage == 15}
-	<PointMult bind:stage {socket} bind:receivedData />
-	<!-- Drinking Bonus -->
-{:else if stage == 16}
-	<PromptAct3 bind:stage {socket} bind:receivedData /> <!-- Act 3 -->
-{:else if stage == 17}
-	<Submitted bind:stage {socket} bind:receivedData />
-{:else if stage == 18}
-	<Pole bind:stage {socket} bind:receivedData />
-{:else if stage == 19}
-	<AllPole bind:stage {socket} bind:receivedData />
-{:else if stage == 20}
-	<Submitted bind:stage {socket} bind:receivedData />
 {:else}
-	<Restart bind:stage {socket} bind:receivedData />
+	<svelte:component
+		this={componentList[stage - 1]}
+		bind:stage
+		{socket}
+		bind:receivedData
+	/>
 {/if}
 
 <style>
