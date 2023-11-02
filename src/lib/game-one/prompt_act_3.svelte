@@ -49,6 +49,8 @@
     };
 
     function submitPromptOne() {
+        if (userInputPromptOne == "" && userInputPromptTwo == "") return;
+
         const message = {
             promptOneFragmentOne: promptOneFragmentOne1,
             promptOneFragmentTwo: promptOneFragmentTwo1,
@@ -65,6 +67,8 @@
     }
 
     function submitPromptTwo() {
+        if (userInputPromptOne == "" && userInputPromptTwo == "") return;
+
         stage++;
 
         const message = {
