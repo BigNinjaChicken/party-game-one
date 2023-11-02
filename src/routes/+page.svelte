@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	import Login from "../lib/Login.svelte";
-	import ReadyUp from "../lib/game-one/app.svelte";
-	import Prompt from "../lib/game-one/prompt.svelte";
-	import Submitted from "../lib/game-one/submitted.svelte";
-	import Pole from "../lib/game-one/pole.svelte";
-	import AllPole from "../lib/game-one/all_pole.svelte";
-	import PointMult from "../lib/game-one/point_mult.svelte";
-	import PromptAct3 from "../lib/game-one/prompt_act_3.svelte";
-	import Restart from "../lib/game-one/restart.svelte";
+	import Login from "$lib/Login.svelte";
+	import ReadyUp from "$lib/game-one/app.svelte";
+	import Prompt from "$lib/game-one/prompt.svelte";
+	import Submitted from "$lib/game-one/submitted.svelte";
+	import Pole from "$lib/game-one/pole.svelte";
+	import AllPole from "$lib/game-one/all_pole.svelte";
+	import PointMult from "$lib/game-one/point_mult.svelte";
+	import PromptAct3 from "$lib/game-one/prompt_act_3.svelte";
+	import Restart from "$lib/game-one/restart.svelte";
 
 	let stage: number;
 	let socket: WebSocket;
@@ -85,7 +85,8 @@
 {:else if stage == 8}
 	<Submitted bind:stage {socket} bind:receivedData />
 {:else if stage == 9}
-	<PointMult bind:stage {socket} bind:receivedData /> <!-- Drinking Bonus -->
+	<PointMult bind:stage {socket} bind:receivedData />
+	<!-- Drinking Bonus -->
 {:else if stage == 10}
 	<Prompt bind:stage {socket} bind:receivedData /> <!-- Act 2 -->
 {:else if stage == 11}
@@ -97,7 +98,8 @@
 {:else if stage == 14}
 	<Submitted bind:stage {socket} bind:receivedData />
 {:else if stage == 15}
-	<PointMult bind:stage {socket} bind:receivedData /> <!-- Drinking Bonus -->
+	<PointMult bind:stage {socket} bind:receivedData />
+	<!-- Drinking Bonus -->
 {:else if stage == 16}
 	<PromptAct3 bind:stage {socket} bind:receivedData /> <!-- Act 3 -->
 {:else if stage == 17}
@@ -111,3 +113,12 @@
 {:else}
 	<Restart bind:stage {socket} bind:receivedData />
 {/if}
+
+<style>
+	@font-face {
+		font-family: "Scrappy";
+		font-style: normal;
+		font-weight: 100;
+		src: url("/fonts/Scrappy.ttf") format("truetype");
+	}
+</style>

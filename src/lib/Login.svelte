@@ -8,7 +8,7 @@
     export let receivedData: any;
 
     const generateRandomName = () => {
-        const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan"];
+        const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan", "Jelani"];
         const randomIndex = Math.floor(Math.random() * names.length);
         randomName = names[randomIndex];
     };
@@ -90,7 +90,7 @@
                 class="box has-shadow"
                 style="max-width: 400px; margin: 0 auto; padding: 20px;"
             >
-                <h1 class="title is-4">AlcyBox Join Menu</h1>
+                <h1 class="title is-3">AlcyBox Join Menu</h1>
                 <div class="field">
                     <label class="label" for="input1">Lobby Code</label>
                     <div class="control">
@@ -135,8 +135,8 @@
     .background {
         background: linear-gradient(
             to bottom right,
-            rgb(100, 236, 223),
-            rgb(221, 0, 223)
+            #5382da,
+            rgb(86, 224, 81)
         );
         background-size: 200% 200%;
         animation: rotateGradient 10s linear infinite;
@@ -151,4 +151,8 @@
             background-position: 100% 100%;
         }
     }
+
+	h1 {
+		font-family: "Scrappy", sans-serif;
+	}
 </style>
