@@ -24,21 +24,18 @@
 		ReadyUp,
 		Submitted, // Tutorial
 		Prompt, // Act 1
-		Submitted,
 		Pole,
 		AllPole,
 		Submitted,
 		PointMult, // Drinking Bonus
 		Takeshotready,
 		Prompt, // Act 2
-		Submitted,
 		Pole,
 		AllPole,
 		Submitted,
 		PointMult, // Drinking Bonus
 		Takeshotready,
 		PromptAct3, // Act 3
-		Submitted,
 		Pole,
 		AllPole,
 		Submitted,

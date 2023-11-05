@@ -23,11 +23,18 @@
 
     let clientId: string;
 
+    let bAllSubmitted = false;
+
     socket.onmessage = async (event: any) => {
         console.log("WebSocket message received", event);
         receivedData = JSON.parse(event.data);
 
         if (receivedData.Stage == "Pole") {
+            bAllSubmitted = true;
+
+            submitPromptTwo();
+            submitPromptOne();
+            
             stage++;
         }
 
@@ -49,35 +56,31 @@
     };
 
     function submitPromptOne() {
-        if (userInputPromptOne.length === 0 && userInputPromptTwo.length === 0) return;
+        if (userInputPromptOne.length === 0 && !bAllSubmitted)
+            return;
+        
+        bAllSubmitted = true;
 
         const message = {
             promptOneFragmentOne: promptOneFragmentOne1,
             promptOneFragmentTwo: promptOneFragmentTwo1,
             userInputPromptOne: userInputPromptOne,
-            userInputPromptTwo: userInputPromptTwo,
         };
-
-        userInputPromptOne = "";
-        userInputPromptTwo = "";
-
         socket.send(JSON.stringify(message));
-
-        showPromptTwo = true;
     }
 
     function submitPromptTwo() {
-        if (userInputPromptOne.length === 0 && userInputPromptTwo.length === 0) return;
-
-        stage++;
+        if (userInputPromptTwo.length === 0 && !bAllSubmitted)
+            return;
 
         const message = {
             promptTwoFragmentOne: promptTwoFragmentOne1,
             promptTwoFragmentTwo: promptTwoFragmentTwo1,
-            userInputPromptOne: userInputPromptOne,
             userInputPromptTwo: userInputPromptTwo,
         };
         socket.send(JSON.stringify(message));
+
+        showPromptTwo = true;
     }
 </script>
 
@@ -119,7 +122,7 @@
                                 />
                                 <button
                                     class="button"
-                                    on:click={submitPromptOne}>Submit</button
+                                    on:click={submitPromptTwo}>Submit</button
                                 >
                             </div>
                         {:else}
@@ -141,7 +144,7 @@
                                 />
                                 <button
                                     class="button"
-                                    on:click={submitPromptTwo}>Submit</button
+                                    on:click={submitPromptOne}>Submit</button
                                 >
                             </div>
                         {:else}
