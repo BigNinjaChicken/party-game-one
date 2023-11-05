@@ -6,6 +6,7 @@
     export let stage: number;
     export let socket: WebSocket;
     export let receivedData: any;
+    export let tabBarPlayerName: string;
 
     const generateRandomName = () => {
         const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan", "Jelani", "Gus", "Isaac"];
@@ -38,6 +39,8 @@
         if (enteredLobbyCode && enteredPlayerName) {
             console.log("Lobby Code:", enteredLobbyCode);
             console.log("Player Name:", enteredPlayerName);
+
+            tabBarPlayerName = enteredPlayerName.toUpperCase();
 
             const data = {
                 bJoinGame: true,

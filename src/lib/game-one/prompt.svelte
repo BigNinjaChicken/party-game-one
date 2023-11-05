@@ -1,5 +1,7 @@
 <script lang="ts">
-    import Submitted from "./submitted.svelte";
+    import { ProgressBar } from "@skeletonlabs/skeleton";
+    import { slide } from "svelte/transition";
+    import { quintOut } from "svelte/easing";
 
     export let stage: number;
     export let socket: WebSocket;
@@ -23,57 +25,89 @@
 
     let bAllSubmitted = false;
 
-    socket.onmessage = async (event: any) => {
-        console.log("WebSocket message received", event);
-        receivedData = JSON.parse(event.data);
+    let timeLeft: number = 60; // You can set the initial time left value in seconds
+    let totalTime: number = 60; // Total time duration in seconds
 
-        if (receivedData.Stage == "Pole") {
-            bAllSubmitted = true;
+    let bOverride : boolean = true;
 
-            submitPromptTwo();
-            submitPromptOne();
-            
-            stage++;
+    function updateTimeLeft() {
+        if (timeLeft > 0) {
+            timeLeft--;
+            setTimeout(updateTimeLeft, 1000); // Update every 1 second
+        } else {
+            bOverride = true;
+            if (!bAllSubmitted) {
+                if (showPromptTwo) {
+                    submitPromptTwo();
+                } else {
+                    submitPromptOne();
+                }
+            }
         }
+    }
 
-        promptOneFragmentOne = receivedData.promptOneFragmentOne;
-        promptOneFragmentOnePlayerId =
-            receivedData.promptOneFragmentOnePlayerId;
-        promptOneFragmentTwo = receivedData.promptOneFragmentTwo;
-        promptOneFragmentTwoPlayerId =
-            receivedData.promptOneFragmentTwoPlayerId;
+    try {
+        socket.onmessage = async (event: any) => {
+            console.log("WebSocket message received", event);
+            receivedData = JSON.parse(event.data);
 
-        promptTwoFragmentOne = receivedData.promptTwoFragmentOne;
-        promptTwoFragmentOnePlayerId =
-            receivedData.promptTwoFragmentOnePlayerId;
-        promptTwoFragmentTwo = receivedData.promptTwoFragmentTwo;
-        promptTwoFragmentTwoPlayerId =
-            receivedData.promptTwoFragmentTwoPlayerId;
+            if (receivedData.Timer) {
+                totalTime = Number(receivedData.Timer) - 1;
+                timeLeft = totalTime;
 
-        clientId = receivedData.clientId;
-    };
+                updateTimeLeft();
+                return;
+            }
+
+            if (receivedData.Stage == "Pole") {
+                bAllSubmitted = true;
+
+                submitPromptTwo();
+                submitPromptOne();
+
+                stage++;
+                return;
+            }
+
+            promptOneFragmentOne = receivedData.promptOneFragmentOne;
+            promptOneFragmentOnePlayerId =
+                receivedData.promptOneFragmentOnePlayerId;
+            promptOneFragmentTwo = receivedData.promptOneFragmentTwo;
+            promptOneFragmentTwoPlayerId =
+                receivedData.promptOneFragmentTwoPlayerId;
+
+            promptTwoFragmentOne = receivedData.promptTwoFragmentOne;
+            promptTwoFragmentOnePlayerId =
+                receivedData.promptTwoFragmentOnePlayerId;
+            promptTwoFragmentTwo = receivedData.promptTwoFragmentTwo;
+            promptTwoFragmentTwoPlayerId =
+                receivedData.promptTwoFragmentTwoPlayerId;
+
+            clientId = receivedData.clientId;
+        };
+    } catch {}
 
     function submitPromptOne() {
-        if (userInputPromptOne.length === 0 && !bAllSubmitted)
-            return;
-        
+        if (!bOverride)
+            if (userInputPromptOne.length === 0 && !bAllSubmitted) return;
+
         bAllSubmitted = true;
 
         const message = {
-            promptOneFragmentOne: promptOneFragmentOne,
-            promptOneFragmentTwo: promptOneFragmentTwo,
+            promptTwoFragmentOne: promptTwoFragmentOne,
+            promptTwoFragmentTwo: promptTwoFragmentTwo,
             userInputPromptOne: userInputPromptOne,
         };
         socket.send(JSON.stringify(message));
     }
 
     function submitPromptTwo() {
-        if (userInputPromptTwo.length === 0 && !bAllSubmitted)
-            return;
+        if (!bOverride)
+            if (userInputPromptTwo.length === 0 && !bAllSubmitted) return;
 
         const message = {
-            promptTwoFragmentOne: promptTwoFragmentOne,
-            promptTwoFragmentTwo: promptTwoFragmentTwo,
+            promptOneFragmentOne: promptOneFragmentOne,
+            promptOneFragmentTwo: promptOneFragmentTwo,
             userInputPromptTwo: userInputPromptTwo,
         };
         socket.send(JSON.stringify(message));
@@ -82,131 +116,143 @@
     }
 </script>
 
-{#if bAllSubmitted}
-    <div class="message">
-        <div class="message-header">All Submitted.</div>
-        <div class="message-body">
-            <!-- Your message content here -->
-        </div>
-    </div>
-{:else}
-    <div class="container">
-        <div class="columns is-centered">
-            <div class="column is-half">
-                <div class="box">
+<body
+    data-theme="crimson"
+    transition:slide={{
+        delay: 250,
+        duration: 300,
+        easing: quintOut,
+        axis: "x",
+    }}
+>
+    {#if bAllSubmitted || timeLeft <= 0}
+        <h1 class="h1 text-center">
+            <span class="gradient-heading text-center">Selected - Waiting On Other Players</span>
+        </h1>
+    {:else}
+        <div class="container mx-auto">
+            <div class="flex justify-center">
+                <div class="w-1/1">
+                    <ProgressBar
+                        label="Progress Bar"
+                        value={100 * (timeLeft / totalTime)}
+                        max={100}
+                    />
                     {#if !showPromptTwo}
-                        <h1 class="title is-4">{promptOneFragmentOne}</h1>
-                        <div class="field">
-                            {#if clientId == promptOneFragmentOnePlayerId}
-                                <div class="control">
-                                    <input
-                                        class="input"
-                                        type="text"
-                                        placeholder="Enter something"
-                                        bind:value={userInputPromptOne}
-                                    />
-                                    <button
-                                        class="button"
-                                        on:click={submitPromptOne}
-                                        >Submit</button
-                                    >
-                                </div>
-                            {:else}
-                                <div class="other-player">Other Player</div>
-                            {/if}
-                        </div>
-                        <h1 class="title is-4">{promptOneFragmentTwo}</h1>
-                        <div class="field">
-                            {#if clientId == promptOneFragmentTwoPlayerId}
-                                <div class="control">
-                                    <input
-                                        class="input"
-                                        type="text"
-                                        placeholder="Enter something"
-                                        bind:value={userInputPromptTwo}
-                                    />
-                                    <button
-                                        class="button"
-                                        on:click={submitPromptTwo}
-                                        >Submit</button
-                                    >
-                                </div>
-                            {:else}
-                                <div class="other-player">Other Player</div>
-                            {/if}
-                        </div>
+                        <div class="text-center p-3">0/2 Prompts Answered</div>
                     {:else}
-                        <!-- Show the second prompt and its input fields -->
-                        <h1 class="title is-4">{promptTwoFragmentOne}</h1>
-                        <div class="field">
-                            {#if clientId == promptTwoFragmentOnePlayerId}
-                                <div class="control">
-                                    <input
-                                        class="input"
-                                        type="text"
-                                        placeholder="Enter something"
-                                        bind:value={userInputPromptOne}
-                                    />
-                                    <button
-                                        class="button"
-                                        on:click={submitPromptOne}
-                                        >Submit</button
-                                    >
-                                </div>
-                            {:else}
-                                <div class="other-player">Other Player</div>
-                            {/if}
-                        </div>
-                        <h1 class="title is-4">{promptTwoFragmentTwo}</h1>
-                        <div class="field">
-                            {#if clientId == promptTwoFragmentTwoPlayerId}
-                                <div class="control">
-                                    <input
-                                        class="input"
-                                        type="text"
-                                        placeholder="Enter something"
-                                        bind:value={userInputPromptTwo}
-                                    />
-                                    <button
-                                        class="button"
-                                        on:click={submitPromptTwo}
-                                        >Submit</button
-                                    >
-                                </div>
-                            {:else}
-                                <div class="other-player">Other Player</div>
-                            {/if}
-                        </div>
+                        <div class="text-center p-3">1/2 Prompts Answered</div>
                     {/if}
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        {#if !showPromptTwo}
+                            <h1 class="my-3 text-lg font-bold text-black">
+                                {promptOneFragmentOne}
+                            </h1>
+                            <div class="mt-4">
+                                {#if clientId == promptOneFragmentOnePlayerId}
+                                    <div class="flex">
+                                        <input
+                                            class="w-full px-3 py-2 border rounded text-black"
+                                            type="text"
+                                            placeholder="Enter something"
+                                            bind:value={userInputPromptOne}
+                                        />
+                                        <button
+                                            class="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+                                            on:click={submitPromptOne}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                {:else}
+                                    <div class="other-player">Other Player</div>
+                                {/if}
+                            </div>
+                            <h1 class="my-3 text-lg font-bold text-black">
+                                {promptOneFragmentTwo}
+                            </h1>
+                            <div class="mt-4">
+                                {#if clientId == promptOneFragmentTwoPlayerId}
+                                    <div class="flex">
+                                        <input
+                                            class="w-full px-3 py-2 border rounded text-black"
+                                            type="text"
+                                            placeholder="Enter something"
+                                            bind:value={userInputPromptTwo}
+                                        />
+                                        <button
+                                            class="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+                                            on:click={submitPromptTwo}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                {:else}
+                                    <div class="other-player">Other Player</div>
+                                {/if}
+                            </div>
+                        {:else}
+                            <!-- Show the second prompt and its input fields -->
+                            <h1 class="my-3 text-lg font-bold text-black">
+                                {promptTwoFragmentOne}
+                            </h1>
+                            <div class="mt-4">
+                                {#if clientId == promptTwoFragmentOnePlayerId}
+                                    <div class="flex">
+                                        <input
+                                            class="w-full px-3 py-2 border rounded text-black"
+                                            type="text"
+                                            placeholder="Enter something"
+                                            bind:value={userInputPromptOne}
+                                        />
+                                        <button
+                                            class="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+                                            on:click={submitPromptOne}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                {:else}
+                                    <div class="other-player">Other Player</div>
+                                {/if}
+                            </div>
+                            <h1 class="my-3 text-lg font-bold text-black">
+                                {promptTwoFragmentTwo}
+                            </h1>
+                            <div class="mt-4">
+                                {#if clientId == promptTwoFragmentTwoPlayerId}
+                                    <div class="flex">
+                                        <input
+                                            class="w-full px-3 py-2 border rounded text-black"
+                                            type="text"
+                                            placeholder="Enter something"
+                                            bind:value={userInputPromptTwo}
+                                        />
+                                        <button
+                                            class="ml-2 px-4 py-2 bg-blue-500 text-white rounded"
+                                            on:click={submitPromptTwo}
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                {:else}
+                                    <div class="other-player">Other Player</div>
+                                {/if}
+                            </div>
+                        {/if}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {/if}
+</body>
 
-    <style>
-        /* Add your CSS styles here if needed */
-        .container {
-            margin-top: 20px;
-        }
-
-        .box {
-            padding: 20px;
-        }
-
-        .field {
-            margin-bottom: 20px;
-        }
-
-        .input {
-            width: 100%;
-        }
-
-        .button {
-            margin-top: 10px;
-        }
-
-        .other-player {
-            color: #999;
-        }
-    </style>
-{/if}
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+</style>

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { onMount } from "svelte";
+	import { AppBar } from "@skeletonlabs/skeleton";
 	import NoSleep from "nosleep.js";
+	import { slide } from "svelte/transition";
+	import { quintOut } from "svelte/easing";
 
 	import Login from "$lib/Login.svelte";
 	import ReadyUp from "$lib/game-one/app.svelte";
@@ -12,10 +15,11 @@
 	import PromptAct3 from "$lib/game-one/prompt_act_3.svelte";
 	import Restart from "$lib/game-one/restart.svelte";
 	import Takeshotready from "$lib/game-one/takeshotready.svelte";
+	import type { Event } from "socket.io";
 
 	let stage: number;
 	let socket: WebSocket;
-	let receivedData = {};
+	let receivedData: any;
 	let isSocketOpen = false;
 	const NODE_ENV = process.env.NODE_ENV;
 
@@ -91,9 +95,16 @@
 		};
 	});
 
+	let tabBarPlayerName: string = "";
+	let tabBarPlayerScore: string = "";
+
 	$: {
 		if (isSocketOpen && stage === 0) {
 			stage = 1;
+		}
+
+		if (receivedData && receivedData.Score) {
+			tabBarPlayerScore = receivedData.Score.toString();
 		}
 	}
 </script>
@@ -110,11 +121,18 @@
 {#if stage == 0}
 	<div />
 {:else}
+	<body data-theme="crimson">
+		<AppBar>
+			<svelte:fragment slot="lead">{tabBarPlayerName}</svelte:fragment>
+			<svelte:fragment slot="trail">{tabBarPlayerScore}</svelte:fragment>
+		</AppBar>
+	</body>
 	<svelte:component
 		this={componentList[stage - 1]}
 		bind:stage
 		{socket}
 		bind:receivedData
+		bind:tabBarPlayerName
 	/>
 {/if}
 

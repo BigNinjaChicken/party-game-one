@@ -7,9 +7,16 @@
 
     let bHasSubmitted = false;
 
+    let optionData: any;
+
     socket.onmessage = async (event: any) => {
         console.log("WebSocket message received", event);
         receivedData = JSON.parse(event.data);
+
+        if (receivedData.Score) return;
+
+        optionData = receivedData;       
+
         if (receivedData.Stage) {
             stage++;
             return;
@@ -29,12 +36,11 @@
 </script>
 
 {#if bHasSubmitted}
-    <div class="message">
-        <div class="message-header">All Submitted.</div>
-        <div class="message-body">
-            <!-- Your message content here -->
-        </div>
-    </div>
+    <body data-theme="crimson">
+        <h1 class="h1 text-center">
+            <span class="gradient-heading text-center">Selected - Waiting On Other Players</span>
+        </h1>
+    </body>
 {:else}
     <main class="section">
         <div class="container">
@@ -45,14 +51,14 @@
                     class:selected={selectedOption === "Option1"}
                     on:click={() => selectOption("Option1")}
                 >
-                    {receivedData.Option1}
+                    {optionData.Option1}
                 </button>
                 <button
                     class="button"
                     class:selected={selectedOption === "Option2"}
                     on:click={() => selectOption("Option2")}
                 >
-                    {receivedData.Option2}
+                    {optionData.Option2}
                 </button>
             </div>
         </div>
@@ -63,5 +69,13 @@
     .selected {
         background-color: #00d1b2;
         color: #fff;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
     }
 </style>

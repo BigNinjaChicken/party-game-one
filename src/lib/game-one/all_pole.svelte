@@ -32,6 +32,8 @@
         console.log("WebSocket message received", event);
         receivedData = JSON.parse(event.data);
 
+        if (receivedData.Score) return;
+
         let i = 0;
         while (true) {
             const promptOneKey = `promptFragmentOne${i}`;
