@@ -1,5 +1,6 @@
 <script lang="ts">
     import Submitted from "./submitted.svelte";
+    import SubmittedTemplate from "./submitted_template.svelte";
 
     export let stage: number;
     export let socket: WebSocket;
@@ -15,12 +16,12 @@
 
         if (receivedData.Score) return;
 
-        optionData = receivedData;       
-
         if (receivedData.Stage) {
             stage++;
             return;
         }
+
+        optionData = receivedData;  
         bHasSubmitted = false;
     };
 
@@ -36,12 +37,8 @@
 </script>
 
 {#if bHasSubmitted}
-    <body data-theme="crimson">
-        <h1 class="h1 text-center">
-            <span class="gradient-heading text-center">Selected - Waiting On Other Players</span>
-        </h1>
-    </body>
-{:else}
+    <SubmittedTemplate />
+{:else if optionData && optionData.Option1 && optionData.Option2}
     <main class="section">
         <div class="container">
             <h1 class="title">Poll Screen</h1>
@@ -69,13 +66,5 @@
     .selected {
         background-color: #00d1b2;
         color: #fff;
-    }
-
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
     }
 </style>

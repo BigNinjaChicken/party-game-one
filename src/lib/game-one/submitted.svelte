@@ -1,4 +1,5 @@
 <script lang="ts">
+    import SubmittedTemplate from "./submitted_template.svelte";
     import { onMount } from "svelte";
 
     export let stage: number;
@@ -19,9 +20,4 @@
     });
 </script>
 
-<div class="message">
-    <div class="message-header">All Submitted.</div>
-    <div class="message-body">
-        <!-- Your message content here -->
-    </div>
-</div>
+<SubmittedTemplate />
