@@ -64,18 +64,18 @@
     };
 </script>
 
-<main class="section">
-    <div class="container">
-        <h1 class="title">Poll Screen</h1>
-        <div class="buttons">
+<body data-theme="crimson">
+    <main class="section">
+        <div class="container">
+            <h1 class="title">Poll Screen</h1>
             {#if bUpdate}
                 {#each prompts as prompt, i}
                     <button
-                        class="button"
+                        class="btn variant-filled"
                         class:selected={selectedOption === `Option${i + 1}`}
                         on:click={() => selectOption(i)}
                     >
-                        <p>
+                        <p class="whitespace-normal">
                             {prompt.promptOne}
                             {prompt.promptOneResponse}
                             {prompt.promptTwo}
@@ -85,5 +85,15 @@
                 {/each}
             {/if}
         </div>
-    </div>
-</main>
+    </main>
+</body>
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+</style>

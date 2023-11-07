@@ -5,6 +5,7 @@
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 
+	import Test from "$lib/game-one/test.svelte";
 	import Login from "$lib/Login.svelte";
 	import ReadyUp from "$lib/game-one/app.svelte";
 	import Prompt from "$lib/game-one/prompt.svelte";
@@ -13,7 +14,7 @@
 	import AllPole from "$lib/game-one/all_pole.svelte";
 	import PointMult from "$lib/game-one/point_mult.svelte";
 	import PromptAct3 from "$lib/game-one/prompt_act_3.svelte";
-	import Restart from "$lib/game-one/restart.svelte";
+	import Restart from "$lib/game-one/test.svelte";
 	import Takeshotready from "$lib/game-one/takeshotready.svelte";
 	import type { Event } from "socket.io";
 

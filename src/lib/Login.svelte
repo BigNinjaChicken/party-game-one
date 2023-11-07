@@ -33,14 +33,14 @@
     async function joinLobby() {
         // Get the lobbyCode and playerName from the input fields
         const enteredLobbyCode = lobbyCode.trim();
-        const enteredPlayerName = playerName.trim();
+        const enteredPlayerName = playerName.trim().toUpperCase();
 
         // Check if lobbyCode and playerName are not empty
         if (enteredLobbyCode && enteredPlayerName) {
             console.log("Lobby Code:", enteredLobbyCode);
             console.log("Player Name:", enteredPlayerName);
 
-            tabBarPlayerName = enteredPlayerName.toUpperCase();
+            tabBarPlayerName = enteredPlayerName;
 
             const data = {
                 bJoinGame: true,

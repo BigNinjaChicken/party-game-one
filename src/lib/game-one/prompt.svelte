@@ -21,6 +21,7 @@
     let promptTwoFragmentOnePlayerId: string;
     let promptTwoFragmentTwoPlayerId: string;
 
+    let partner: string = 'hidden partner';
     let clientId: string;
 
     let bAllSubmitted = false;
@@ -83,6 +84,7 @@
             promptTwoFragmentTwoPlayerId =
                 receivedData.promptTwoFragmentTwoPlayerId;
 
+            if (receivedData.partner) partner = receivedData.partner;
             clientId = receivedData.clientId;
         };
     } catch {}
@@ -96,7 +98,7 @@
         const message = {
             promptTwoFragmentOne: promptTwoFragmentOne,
             promptTwoFragmentTwo: promptTwoFragmentTwo,
-            userInputPromptOne: userInputPromptOne,
+            userInputPromptOne: userInputPromptOne.toUpperCase(),
         };
         socket.send(JSON.stringify(message));
     }
@@ -108,7 +110,7 @@
         const message = {
             promptOneFragmentOne: promptOneFragmentOne,
             promptOneFragmentTwo: promptOneFragmentTwo,
-            userInputPromptTwo: userInputPromptTwo,
+            userInputPromptTwo: userInputPromptTwo.toUpperCase(),
         };
         socket.send(JSON.stringify(message));
 
@@ -127,7 +129,7 @@
 >
     {#if bAllSubmitted || timeLeft <= 0}
         <h1 class="h1 text-center">
-            <span class="gradient-heading text-center">Selected - Waiting On Other Players</span>
+            <span class="gradient-heading text-center">Selected - Waiting On Others</span>
         </h1>
     {:else}
         <div class="container mx-auto">
@@ -165,7 +167,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="text-red-400">{partner} is writing here...</div>
                                 {/if}
                             </div>
                             <h1 class="my-3 text-lg font-bold text-black">
@@ -188,7 +190,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="text-red-400">{partner} is writing here...</div>
                                 {/if}
                             </div>
                         {:else}
@@ -213,7 +215,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="text-red-400">{partner} is writing here...</div>
                                 {/if}
                             </div>
                             <h1 class="my-3 text-lg font-bold text-black">
@@ -236,7 +238,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="text-red-400">{partner} is writing here...</div>
                                 {/if}
                             </div>
                         {/if}

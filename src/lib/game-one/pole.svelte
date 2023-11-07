@@ -1,5 +1,6 @@
 <script lang="ts">
-    import Submitted from "./submitted.svelte";
+    import { slide } from "svelte/transition";
+    import { quintOut } from "svelte/easing";
     import SubmittedTemplate from "./submitted_template.svelte";
 
     export let stage: number;
@@ -21,7 +22,7 @@
             return;
         }
 
-        optionData = receivedData;  
+        optionData = receivedData;
         bHasSubmitted = false;
     };
 
@@ -39,32 +40,48 @@
 {#if bHasSubmitted}
     <SubmittedTemplate />
 {:else if optionData && optionData.Option1 && optionData.Option2}
-    <main class="section">
-        <div class="container">
-            <h1 class="title">Poll Screen</h1>
-            <div class="buttons">
+    <body
+        data-theme="crimson"
+        transition:slide={{
+            delay: 250,
+            duration: 300,
+            easing: quintOut,
+            axis: "x",
+        }}
+    >
+        <main class="section bg-gray-900 text-white">
+            <div class="container mx-auto p-4">
+                <h1 class="text-2xl mb-4 text-white">Poll Screen</h1>
                 <button
-                    class="button"
+                    class="btn bg-blue-500 text-white py-2 px-4 rounded-full mb-2"
                     class:selected={selectedOption === "Option1"}
                     on:click={() => selectOption("Option1")}
                 >
-                    {optionData.Option1}
+                    <p class="whitespace-normal">{optionData.Option1}</p>
                 </button>
                 <button
-                    class="button"
+                    class="btn bg-blue-500 text-white py-2 px-4 rounded-full"
                     class:selected={selectedOption === "Option2"}
                     on:click={() => selectOption("Option2")}
                 >
-                    {optionData.Option2}
+                    <p class="whitespace-normal">{optionData.Option2}</p>
                 </button>
             </div>
-        </div>
-    </main>
+        </main>
+    </body>
 {/if}
 
 <style>
     .selected {
         background-color: #00d1b2;
         color: #fff;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
     }
 </style>
