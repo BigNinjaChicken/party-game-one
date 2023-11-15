@@ -39,7 +39,7 @@
 
 {#if bHasSubmitted}
     <SubmittedTemplate />
-{:else if optionData && optionData.Option1 && optionData.Option2}
+{:else if optionData}
     <body
         data-theme="crimson"
         transition:slide={{

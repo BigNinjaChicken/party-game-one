@@ -18,19 +18,18 @@ io.on('connection', (socket) => {
 
 app.use(handler);
 
-const wss = new WebSocketServer({ server }); 
+const wss = new WebSocketServer({ server });
 
 const clients = new Map();
 const sessions = new Map();
 
 wss.on('connection', (ws) => {
   // Store client information with the WebSocket connection
-  const clientId = randomUUID();
   const clientInfo = {
     clientType: "",
     sessionCode: "",
     playerName: "",
-    clientId: clientId
+    recentMessageRecieved: "",
   };
 
   // Store the clientInfo object with the WebSocket connection
@@ -43,26 +42,38 @@ wss.on('connection', (ws) => {
     const messageJSON = JSON.parse(data);
     const clientInfo = clients.get(ws);
 
+    // Add logic to update the game stage
+    if (messageJSON.Stage && clientInfo.clientType === "Unreal") {
+      const session = sessions.get(clientInfo.sessionCode);
+      if (session) {
+        session.stage = messageJSON.Stage;
+      }
+    }
+
     // Once in session send messages back and forth
     if (sessions.has(clientInfo.sessionCode)) {
+      const session = sessions.get(clientInfo.sessionCode);
+      const allSessionUsers = session.clients;
+
       if (clientInfo.clientType === "Unreal") {
-        const allSessionUsers = sessions.get(clientInfo.sessionCode);
         for (const sessionUser of allSessionUsers) {
           if (clients.get(sessionUser).clientType === "Web") {
-            if (messageJSON.clientId) {
-              if (clients.get(sessionUser).clientId == messageJSON.clientId) // if Unreal wants to do a user specific call
+            if (messageJSON.playerName) {
+              if (clients.get(sessionUser).playerName == messageJSON.playerName) // if Unreal wants to do a user specific call
                 sessionUser.send(JSON.stringify(messageJSON));
+                if (!messageJSON.Score) clients.get(sessionUser).recentMessageRecieved = JSON.stringify(messageJSON);
             } else {
               sessionUser.send(JSON.stringify(messageJSON));
+              if (!messageJSON.Score)clients.get(sessionUser).recentMessageRecieved = JSON.stringify(messageJSON);
             }
           }
         }
       } else if (clientInfo.clientType === "Web") {
-        const allSessionUsers = sessions.get(clientInfo.sessionCode);
         for (const sessionUser of allSessionUsers) {
           if (clients.get(sessionUser).clientType === "Unreal") {
             messageJSON.clientInfo = clients.get(ws);
             sessionUser.send(JSON.stringify(messageJSON));
+            if (!messageJSON.Score)clients.get(sessionUser).recentMessageRecieved = JSON.stringify(messageJSON);
             break; // Only 1 Unreal User
           }
         }
@@ -82,8 +93,8 @@ wss.on('connection', (ws) => {
       if (clientInfo.clientType === "Unreal") {
         const sessionCode = generateRandomCode(4);
 
-        sessions.set(sessionCode, []);
-        sessions.get(sessionCode).push(ws);
+        // Initialize the session with an empty client list and a starting stage
+        sessions.set(sessionCode, { clients: [ws], stage: 2 });
         clientInfo.sessionCode = sessionCode;
 
         const sessionData = {
@@ -95,25 +106,46 @@ wss.on('connection', (ws) => {
       return;
     }
 
-    // Join a session
+    // Join or Rejoin a session
     if (messageJSON.bJoinGame && clientInfo.clientType === "Web") {
       const sessionCodeToJoin = messageJSON.sessionCode;
 
       if (sessions.has(sessionCodeToJoin)) {
-        const response = {
-          bValidSession: true,
-        };
-        ws.send(JSON.stringify(response));
-        clientInfo.sessionCode = sessionCodeToJoin;
-        clientInfo.playerName = messageJSON.playerName;
+        const session = sessions.get(sessionCodeToJoin);
+        const sessionClients = session.clients;
+        let reconnected = false;
 
-        sessions.get(sessionCodeToJoin).push(ws);
-        console.log(`Web client joined session: ${sessionCodeToJoin}`);
+        for (const sessionClient of sessionClients) {
+          const sessionClientInfo = clients.get(sessionClient);
+
+          // Reconnect if the playerName match
+          if (sessionClientInfo.playerName === messageJSON.playerName) {
+            console.log(`Reconnecting client: ${messageJSON.playerName}`);
+            clientInfo.sessionCode = sessionClientInfo.sessionCode;
+            clientInfo.playerName = sessionClientInfo.playerName;
+            clientInfo.recentMessageRecieved = sessionClientInfo.recentMessageRecieved;
+            sessionClients[sessionClients.indexOf(sessionClient)] = ws; // Update the connection
+            reconnected = true;
+            break;
+          }
+        }
+
+        if (!reconnected) {
+          console.log(`New client joining: ${messageJSON.playerName}`);
+          clientInfo.playerName = messageJSON.playerName;
+          clientInfo.sessionCode = messageJSON.sessionCode;
+          sessionClients.push(ws);
+        }
+
+        // Send current game stage along with reconnection confirmation
+        ws.send(JSON.stringify({ bValidSession: true, currentStage: session.stage }));
+
+        // Send information they need for the stage
+        if (reconnected) {
+          ws.send( clientInfo.recentMessageRecieved );
+        }
       } else {
-        const response = {
-          bValidSession: false
-        };
-        ws.send(JSON.stringify(response));
+        ws.send(JSON.stringify({ bValidSession: false }));
         console.log("Invalid Room");
       }
       return;
@@ -123,8 +155,6 @@ wss.on('connection', (ws) => {
   // Stop tracking the client upon that client closing the connection
   ws.on('close', () => {
     console.log(`Connection closed`);
-    sessions.delete(ws);
-    clients.delete(ws);
   });
 });
 

@@ -22,7 +22,7 @@
     let promptTwoFragmentTwoPlayerId: string;
 
     let partner: string = 'hidden partner';
-    let clientId: string;
+    let playerName: string;
 
     let bAllSubmitted = false;
 
@@ -60,13 +60,13 @@
                 return;
             }
 
-            if (receivedData.Stage == "Pole") {
+            if (receivedData.Stage) {
                 bAllSubmitted = true;
 
                 submitPromptTwo();
                 submitPromptOne();
 
-                stage++;
+                stage = receivedData.Stage;
                 return;
             }
 
@@ -85,7 +85,7 @@
                 receivedData.promptTwoFragmentTwoPlayerId;
 
             if (receivedData.partner) partner = receivedData.partner;
-            clientId = receivedData.clientId;
+            playerName = receivedData.playerName;
         };
     } catch {}
 
@@ -151,7 +151,7 @@
                                 {promptOneFragmentOne}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptOneFragmentOnePlayerId}
+                                {#if playerName == promptOneFragmentOnePlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -174,7 +174,7 @@
                                 {promptOneFragmentTwo}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptOneFragmentTwoPlayerId}
+                                {#if playerName == promptOneFragmentTwoPlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -199,7 +199,7 @@
                                 {promptTwoFragmentOne}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptTwoFragmentOnePlayerId}
+                                {#if playerName == promptTwoFragmentOnePlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -222,7 +222,7 @@
                                 {promptTwoFragmentTwo}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptTwoFragmentTwoPlayerId}
+                                {#if playerName == promptTwoFragmentTwoPlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"

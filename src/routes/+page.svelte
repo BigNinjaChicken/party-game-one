@@ -2,8 +2,6 @@
 	import { onMount } from "svelte";
 	import { AppBar } from "@skeletonlabs/skeleton";
 	import NoSleep from "nosleep.js";
-	import { slide } from "svelte/transition";
-	import { quintOut } from "svelte/easing";
 
 	import Test from "$lib/game-one/test.svelte";
 	import Login from "$lib/Login.svelte";
@@ -16,7 +14,6 @@
 	import PromptAct3 from "$lib/game-one/prompt_act_3.svelte";
 	import Restart from "$lib/game-one/test.svelte";
 	import Takeshotready from "$lib/game-one/takeshotready.svelte";
-	import type { Event } from "socket.io";
 
 	let stage: number;
 	let socket: WebSocket;
@@ -49,7 +46,7 @@
 
 	stage = 0;
 
-	onMount(async () => {
+	function begin() {
 		if (NODE_ENV == "dev") {
 			socket = new WebSocket("ws://localhost:8080");
 		} else if (NODE_ENV == "prod") {
@@ -93,7 +90,13 @@
 
 		socket.onclose = (event) => {
 			console.log("WebSocket connection closed", event);
+			isSocketOpen = false;
+			stage = 0;
 		};
+	}
+
+	onMount(async () => {
+		begin();
 	});
 
 	let tabBarPlayerName: string = "";
@@ -108,6 +111,10 @@
 			tabBarPlayerScore = receivedData.Score.toString();
 		}
 	}
+
+	function deleteConnection() {
+		socket.close();
+	}
 </script>
 
 <svelte:head>
@@ -119,6 +126,20 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </svelte:head>
 
+{#if NODE_ENV == "dev"}
+<button
+	class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+	on:click={deleteConnection}
+>
+	Disconnect
+</button>
+<button
+	class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+	on:click={begin}
+>
+	Reconnect
+</button>
+{/if}
 {#if stage == 0}
 	<div />
 {:else}

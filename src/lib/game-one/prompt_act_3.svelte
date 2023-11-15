@@ -25,7 +25,8 @@
     let promptTwoFragmentTwo2: string;
     let promptTwoFragmentTwoPlayerId: string;
 
-    let clientId: string;
+    let partner: string = 'hidden partner';
+    let playerName: string;
 
     let bAllSubmitted = false;
 
@@ -51,13 +52,13 @@
             return;
         }
 
-        if (receivedData.Stage == "Pole") {
+        if (receivedData.Stage) {
             bAllSubmitted = true;
 
             submitPromptTwo();
             submitPromptOne();
 
-            stage++;
+            stage = receivedData.Stage;
             return;
         }
 
@@ -79,7 +80,8 @@
         promptTwoFragmentTwoPlayerId =
             receivedData.promptTwoFragmentTwoPlayerId;
 
-        clientId = receivedData.clientId;
+        if (receivedData.partner) partner = receivedData.partner;
+        playerName = receivedData.playerName;
     };
 
     function submitPromptOne() {
@@ -145,7 +147,7 @@
                                 {promptOneFragmentOne2}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptOneFragmentOnePlayerId}
+                                {#if playerName == promptOneFragmentOnePlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -161,7 +163,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="other-player">{partner} is writing here...</div>
                                 {/if}
                             </div>
                             <h1 class="my-3 text-lg font-bold text-black">
@@ -169,7 +171,7 @@
                                 {promptOneFragmentTwo2}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptOneFragmentTwoPlayerId}
+                                {#if playerName == promptOneFragmentTwoPlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -185,7 +187,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="other-player">{partner} is writing here...</div>
                                 {/if}
                             </div>
                         {:else}
@@ -195,7 +197,7 @@
                                 {promptTwoFragmentOne2}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptTwoFragmentOnePlayerId}
+                                {#if playerName == promptTwoFragmentOnePlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -211,7 +213,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="other-player">{partner} is writing here...</div>
                                 {/if}
                             </div>
                             <h1 class="my-3 text-lg font-bold text-black">
@@ -219,7 +221,7 @@
                                 {promptTwoFragmentTwo2}
                             </h1>
                             <div class="mt-4">
-                                {#if clientId == promptTwoFragmentTwoPlayerId}
+                                {#if playerName == promptTwoFragmentTwoPlayerId}
                                     <div class="flex">
                                         <input
                                             class="w-full px-3 py-2 border rounded text-black"
@@ -235,7 +237,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="other-player">Other Player</div>
+                                    <div class="other-player">{partner} is writing here...</div>
                                 {/if}
                             </div>
                         {/if}

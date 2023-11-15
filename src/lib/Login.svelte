@@ -20,13 +20,23 @@
     let joinText: string = "Join";
     let lobbyCode: string = "";
     let playerName: string = "";
-    let errorText: string = ""; // Add errorText variable for error handling
+    let errorText: string = ""; 
 
     onMount(async () => {
         socket.onmessage = async (event) => {
             console.log("WebSocket message received", event);
-            receivedData = JSON.parse(event.data);
-            stage = 2;
+            const data = JSON.parse(event.data);
+
+            // Handle different types of messages from the server
+            if (data.bValidSession !== undefined) {
+                if (data.bValidSession) {
+                    stage = data.currentStage; // Update stage from server data
+                    joinText = "Joined";
+                } else {
+                    errorText = "Invalid Lobby Code"; // Show error
+                    joinText = "Join";
+                }
+            }
         };
     });
 

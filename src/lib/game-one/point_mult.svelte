@@ -27,14 +27,12 @@
             for (let i = 0; i < 100; i++) {
                 const playerName = receivedData[`PlayerName${i}`];
                 if (playerName == "") break; // Go untill empty player name
-                const playerId = receivedData[`PlayerID${i}`];
                 const playerScoreBonusOption =
                     receivedData[`PlayerScoreBonusOption${i}`];
                 if (playerName && playerScoreBonusOption) {
                     players.push({
                         name: playerName,
                         scoreBonusOption: playerScoreBonusOption,
-                        id: playerId,
                     });
                 }
             }
@@ -44,7 +42,7 @@
     function selectPlayer(player: any) {
         hasSelected = true;
         const message = {
-            selectedPlayerId: player.id,
+            selectedPlayerName: player.name,
             multiplier: player.scoreBonusOption,
         };
         socket.send(JSON.stringify(message));
