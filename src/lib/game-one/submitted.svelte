@@ -15,7 +15,10 @@
         socket.onmessage = async (event) => {
             console.log("WebSocket message received", event);
             receivedData = JSON.parse(event.data);
-            if (receivedData.Stage) stage++;
+            if (receivedData.Stage) {
+                stage = receivedData.Stage;
+                return;
+            }
         };
     });
 </script>

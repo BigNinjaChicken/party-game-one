@@ -18,7 +18,7 @@
             console.log("WebSocket message received", event);
             receivedData = JSON.parse(event.data);
             if (receivedData.Stage) {
-                stage++;
+                stage = receivedData.Stage;
                 return;
             }
 

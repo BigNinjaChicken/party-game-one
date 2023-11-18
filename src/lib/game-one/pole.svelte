@@ -18,7 +18,7 @@
         if (receivedData.Score) return;
 
         if (receivedData.Stage) {
-            stage++;
+            stage = receivedData.Stage;
             return;
         }
 

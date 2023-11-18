@@ -5,6 +5,7 @@
 
     let selectedOption: string = "";
     let bUpdate = false;
+    let bAllSubmitted = false;
 
     // Create a function to select an option
     function selectOption(option: number) {
@@ -13,8 +14,7 @@
             option: option,
         };
         socket.send(JSON.stringify(jsonMessage));
-
-        stage++;
+        bAllSubmitted = true;
     }
 
     type Prompt = {
@@ -31,6 +31,11 @@
     socket.onmessage = async (event: any) => {
         console.log("WebSocket message received", event);
         receivedData = JSON.parse(event.data);
+
+        if (receivedData.Stage) {
+            stage = receivedData.Stage;
+            return;
+        }
 
         if (receivedData.Score) return;
 
@@ -65,27 +70,29 @@
 </script>
 
 <body data-theme="crimson">
-    <main class="section">
-        <div class="container">
-            <h1 class="title">Poll Screen</h1>
-            {#if bUpdate}
-                {#each prompts as prompt, i}
-                    <button
-                        class="btn variant-filled"
-                        class:selected={selectedOption === `Option${i + 1}`}
-                        on:click={() => selectOption(i)}
-                    >
-                        <p class="whitespace-normal">
-                            {prompt.promptOne}
-                            {prompt.promptOneResponse}
-                            {prompt.promptTwo}
-                            {prompt.promptTwoResponse}
-                        </p>
-                    </button>
-                {/each}
-            {/if}
-        </div>
-    </main>
+    {#if !bAllSubmitted}
+        <main class="section">
+            <div class="container">
+                <h1 class="title">Poll Screen</h1>
+                {#if bUpdate}
+                    {#each prompts as prompt, i}
+                        <button
+                            class="btn variant-filled"
+                            class:selected={selectedOption === `Option${i + 1}`}
+                            on:click={() => selectOption(i)}
+                        >
+                            <p class="whitespace-normal">
+                                {prompt.promptOne}
+                                {prompt.promptOneResponse}
+                                {prompt.promptTwo}
+                                {prompt.promptTwoResponse}
+                            </p>
+                        </button>
+                    {/each}
+                {/if}
+            </div>
+        </main>
+    {/if}
 </body>
 
 <style>

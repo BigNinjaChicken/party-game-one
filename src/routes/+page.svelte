@@ -8,6 +8,7 @@
 	import ReadyUp from "$lib/game-one/app.svelte";
 	import Prompt from "$lib/game-one/prompt.svelte";
 	import Submitted from "$lib/game-one/submitted.svelte";
+	import Scoreboard from "$lib/game-one/Scoreboard.svelte";
 	import Pole from "$lib/game-one/pole.svelte";
 	import AllPole from "$lib/game-one/all_pole.svelte";
 	import PointMult from "$lib/game-one/point_mult.svelte";
@@ -28,19 +29,19 @@
 		Prompt, // Act 1
 		Pole,
 		AllPole,
-		Submitted,
+		Scoreboard,
 		PointMult, // Drinking Bonus
 		Takeshotready,
 		Prompt, // Act 2
 		Pole,
 		AllPole,
-		Submitted,
+		Scoreboard,
 		PointMult, // Drinking Bonus
 		Takeshotready,
 		PromptAct3, // Act 3
 		Pole,
 		AllPole,
-		Submitted,
+		Scoreboard,
 		Restart,
 	];
 

@@ -5,13 +5,15 @@
     export let socket: WebSocket;
     export let receivedData: any;
 
+    let selectedDifficulty: number | null = null;
+
     onMount(async () => {
         socket.onmessage = async (event: any) => {
             receivedData = JSON.parse(event.data);
 
-            if (receivedData.Stage == "Tutorial") {
-                console.log("WebSocket message received", event);
-                stage = 3;
+            if (receivedData.Stage) {
+                stage = receivedData.Stage;
+                return;
             }
         };
     });
@@ -30,6 +32,11 @@
         };
         socket.send(JSON.stringify(message));
     }
+
+    function selectDifficulty(difficulty: number) {
+        selectedDifficulty = difficulty;
+        socket.send(JSON.stringify({ difficultySelected: difficulty }));
+    }
 </script>
 
 <section class="hero is-primary is-fullheight">
@@ -37,6 +44,26 @@
         <div class="container has-text-centered">
             <h1 class="title is-size-1">Welcome to the Game</h1>
             <p class="subtitle is-size-4">Get ready for some fun!</p>
+
+            <!-- Difficulty Buttons -->
+            {#if selectedDifficulty == null}
+                <div class="mb-4">
+                    <button
+                        class="button is-info mr-2"
+                        on:click={() => selectDifficulty(1)}>Easy</button
+                    >
+                    <button
+                        class="button is-warning mr-2"
+                        on:click={() => selectDifficulty(2)}>Medium</button
+                    >
+                    <button
+                        class="button is-danger"
+                        on:click={() => selectDifficulty(3)}>Hard</button
+                    >
+                </div>
+            {/if}
+
+            <!-- Ready Button -->
             <button
                 class="button is-success is-size-5"
                 on:click={toggleReady}
