@@ -7,6 +7,7 @@
     export let socket: WebSocket;
     export let receivedData: any;
     export let tabBarPlayerName: string;
+    export let tabBarCode: string;
 
     const generateRandomName = () => {
         const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan", "Jelani", "Gus", "Isaac"];
@@ -51,6 +52,7 @@
             console.log("Player Name:", enteredPlayerName);
 
             tabBarPlayerName = enteredPlayerName;
+            tabBarCode = enteredLobbyCode;
 
             const data = {
                 bJoinGame: true,

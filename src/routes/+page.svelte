@@ -102,6 +102,7 @@
 
 	let tabBarPlayerName: string = "";
 	let tabBarPlayerScore: string = "";
+	let tabBarCode: string = "";
 
 	$: {
 		if (isSocketOpen && stage === 0) {
@@ -128,25 +129,31 @@
 </svelte:head>
 
 {#if NODE_ENV == "dev"}
-<button
-	class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-	on:click={deleteConnection}
->
-	Disconnect
-</button>
-<button
-	class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-	on:click={begin}
->
-	Reconnect
-</button>
+	<button
+		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+		on:click={deleteConnection}
+	>
+		Disconnect
+	</button>
+	<button
+		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+		on:click={begin}
+	>
+		Reconnect
+	</button>
 {/if}
 {#if stage == 0}
-	<div />
+	<button
+		class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+		on:click={begin}
+	>
+		Reconnect
+	</button>
 {:else}
 	<body data-theme="crimson">
 		<AppBar>
 			<svelte:fragment slot="lead">{tabBarPlayerName}</svelte:fragment>
+			<svelte:fragment slot="headline">{tabBarCode}</svelte:fragment>
 			<svelte:fragment slot="trail">{tabBarPlayerScore}</svelte:fragment>
 		</AppBar>
 	</body>
@@ -156,6 +163,7 @@
 		{socket}
 		bind:receivedData
 		bind:tabBarPlayerName
+		bind:tabBarCode
 	/>
 {/if}
 
