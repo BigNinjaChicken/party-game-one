@@ -92,7 +92,7 @@
         const message = {
             promptTwoFragmentOne: promptTwoFragmentOne1,
             promptTwoFragmentTwo: promptTwoFragmentTwo1,
-            userInputPromptOne: userInputPromptOne,
+            userInputPromptOne: userInputPromptOne.toUpperCase(),
         };
         socket.send(JSON.stringify(message));
     }
@@ -103,7 +103,7 @@
         const message = {
             promptOneFragmentOne: promptOneFragmentOne1,
             promptOneFragmentTwo: promptOneFragmentTwo1,
-            userInputPromptTwo: userInputPromptTwo,
+            userInputPromptTwo: userInputPromptTwo.toUpperCase(),
         };
         socket.send(JSON.stringify(message));
 
