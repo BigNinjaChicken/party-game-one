@@ -47,18 +47,19 @@
 
             <!-- Difficulty Buttons -->
             {#if selectedDifficulty == null}
+                <h2 class="text-center h2">Drinking Mode:</h2>
                 <div class="mb-4">
                     <button
                         class="button is-info mr-2"
-                        on:click={() => selectDifficulty(1)}>Easy</button
+                        on:click={() => selectDifficulty(1)}>Easy: Sip and Socialize</button
                     >
                     <button
                         class="button is-warning mr-2"
-                        on:click={() => selectDifficulty(2)}>Medium</button
+                        on:click={() => selectDifficulty(2)}>Medium: Moderate Sips</button
                     >
                     <button
                         class="button is-danger"
-                        on:click={() => selectDifficulty(3)}>Hard</button
+                        on:click={() => selectDifficulty(3)}>Hard: Challenge Accepted</button
                     >
                 </div>
             {/if}
