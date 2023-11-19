@@ -23,6 +23,11 @@
     let playerName: string = "";
     let errorText: string = ""; 
 
+    if (tabBarPlayerName != "" && tabBarCode != "" && lobbyCode == "" && playerName == "") {
+        lobbyCode = tabBarCode;
+        playerName = tabBarPlayerName;
+    }
+
     onMount(async () => {
         socket.onmessage = async (event) => {
             console.log("WebSocket message received", event);
