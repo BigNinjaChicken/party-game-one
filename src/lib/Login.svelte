@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-	import "bulma/css/bulma.css";
 
     let randomName: string;
     export let stage: number;
@@ -10,7 +9,18 @@
     export let tabBarCode: string;
 
     const generateRandomName = () => {
-        const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan", "Jelani", "Gus", "Isaac"];
+        const names = [
+            "Frazier",
+            "Tom",
+            "Berk",
+            "Jackson",
+            "Chase",
+            "Davis",
+            "Ethan",
+            "Jelani",
+            "Gus",
+            "Isaac",
+        ];
         const randomIndex = Math.floor(Math.random() * names.length);
         randomName = names[randomIndex];
     };
@@ -21,9 +31,14 @@
     let joinText: string = "Join";
     let lobbyCode: string = "";
     let playerName: string = "";
-    let errorText: string = ""; 
+    let errorText: string = "";
 
-    if (tabBarPlayerName != "" && tabBarCode != "" && lobbyCode == "" && playerName == "") {
+    if (
+        tabBarPlayerName != "" &&
+        tabBarCode != "" &&
+        lobbyCode == "" &&
+        playerName == ""
+    ) {
         lobbyCode = tabBarCode;
         playerName = tabBarPlayerName;
     }
@@ -103,65 +118,52 @@
     }
 </script>
 
-<section class="hero is-fullheight background">
-    <div class="hero-body has-text-centered">
-        <div class="container">
-            <div
-                class="box has-shadow"
-                style="max-width: 400px; margin: 0 auto; padding: 20px;"
-            >
-                <h1 class="title is-3">AlcyBox Join Menu</h1>
-                <div class="field">
-                    <label class="label" for="input1">Lobby Code</label>
-                    <div class="control">
-                        <input
-                            class="input"
-                            type="text"
-                            id="input1"
-                            placeholder="ABCD"
-                            on:keydown={handleKeyDown}
-                            on:input={convertToUpperCase}
-                            bind:value={lobbyCode}
-                        />
-                    </div>
+<body data-theme="crimson">
+    <section
+        class="flex justify-center items-center h-screen m-0 bg-gradient-to-br from-blue-500 to-green-400 bg-200% animate-rotateGradient"
+    >
+        <div class="text-center bg-surface-600 rounded-md">
+            <div class="p-5 m-10">
+                <h1 class="text-4xl font-bold">AlcyBox Join Menu</h1>
+                <div class="mb-4">
+                    <label class="block text-lg mb-2" for="input1"
+                        >Lobby Code</label
+                    >
+                    <input
+                        class="w-full px-3 py-2 input"
+                        type="text"
+                        id="input1"
+                        placeholder="ABCD"
+                        on:keydown={handleKeyDown}
+                        on:input={convertToUpperCase}
+                        bind:value={lobbyCode}
+                    />
                 </div>
-                <div class="field">
-                    <label class="label" for="input2">Name</label>
-                    <div class="control">
-                        <input
-                            class="input"
-                            type="text"
-                            id="input2"
-                            placeholder={randomName}
-                            on:keydown={handleKeyDown}
-                            on:input={limitInput}
-                            bind:value={playerName}
-                        />
-                    </div>
+                <div class="mb-4">
+                    <label class="block text-lg mb-2" for="input2">Name</label>
+                    <input
+                        class="w-full px-3 py-2 input"
+                        type="text"
+                        id="input2"
+                        placeholder={randomName}
+                        on:keydown={handleKeyDown}
+                        on:input={limitInput}
+                        bind:value={playerName}
+                    />
                 </div>
                 <button
-                    class="button is-primary is-fullwidth"
+                    class="btn variant-filled-success px-10"
                     on:click={joinLobby}>{joinText}</button
                 >
                 {#if errorText}
-                    <p class="has-text-danger">{errorText}</p>
+                    <p class="text-red-500 pt-5">{errorText}</p>
                 {/if}
             </div>
         </div>
-    </div>
-</section>
+    </section>
+</body>
 
 <style>
-    .background {
-        background: linear-gradient(
-            to bottom right,
-            #5382da,
-            rgb(86, 224, 81)
-        );
-        background-size: 200% 200%;
-        animation: rotateGradient 10s linear infinite;
-    }
-
     @keyframes rotateGradient {
         0%,
         100% {
@@ -172,7 +174,7 @@
         }
     }
 
-	h1 {
-		font-family: "Scrappy", sans-serif;
-	}
+    h1 {
+        font-family: "Scrappy", sans-serif;
+    }
 </style>

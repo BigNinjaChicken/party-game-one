@@ -5,7 +5,7 @@
     export let socket: WebSocket;
     export let receivedData: any;
 
-    let selectedDifficulty: number | null = null;
+    let chatInput = "";
 
     onMount(async () => {
         socket.onmessage = async (event: any) => {
@@ -33,52 +33,64 @@
         socket.send(JSON.stringify(message));
     }
 
-    function selectDifficulty(difficulty: number) {
-        selectedDifficulty = difficulty;
-        socket.send(JSON.stringify({ difficultySelected: difficulty }));
+    function sendChatMessage() {
+        if (chatInput.trim() !== "") {
+            socket.send(JSON.stringify({ ChatMessage: chatInput }));
+            chatInput = ""; // Clear the input after sending
+        }
     }
 </script>
 
-<section class="hero is-primary is-fullheight">
-    <div class="hero-body">
-        <div class="container has-text-centered">
-            <h1 class="title is-size-1">Welcome to the Game</h1>
-            <p class="subtitle is-size-4">Get ready for some fun!</p>
-
-            <!-- Difficulty Buttons -->
-            {#if selectedDifficulty == null}
-                <h2 class="text-center h2">Drinking Mode:</h2>
-                <div class="mb-4">
+<body data-theme="crimson">
+    <section class="p-4">
+        <div class="max-w-md mx-auto">
+            <div class="bg-surface-500 shadow-md rounded px-8 pt-10 pb-2">
+                <!-- Ready Button -->
+                <div class="mb-10 flex flex-col items-center justify-center">
+                    <h2 class="text-3xl text-md mb-2 text-center">
+                        Ready Up once <span class="font-bold">everyone</span> has
+                        joined:
+                    </h2>
                     <button
-                        class="button is-info mr-2"
-                        on:click={() => selectDifficulty(1)}>Easy: Sip and Socialize</button
+                        class="text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-xl {bIsReady
+                            ? 'bg-primary-500'
+                            : 'bg-secondary-500'}"
+                        on:click={toggleReady}
                     >
-                    <button
-                        class="button is-warning mr-2"
-                        on:click={() => selectDifficulty(2)}>Medium: Moderate Sips</button
-                    >
-                    <button
-                        class="button is-danger"
-                        on:click={() => selectDifficulty(3)}>Hard: Challenge Accepted</button
-                    >
+                        {bIsReady ? "You're Ready!" : "Press Me To Ready Up"}
+                    </button>
                 </div>
-            {/if}
-
-            <!-- Ready Button -->
-            <button
-                class="button is-success is-size-5"
-                on:click={toggleReady}
-                class:ready={bIsReady}
-            >
-                {bIsReady ? "You're Ready!" : "Press Me To Ready Up"}
-            </button>
+            </div>
         </div>
-    </div>
-</section>
+        <!-- Chat UI -->
+        <div class="mt-7">
+            <h1 class="text-lg font-semibold mb-2">
+                Send messages while you wait:
+            </h1>
+            <div
+                class="input-group input-group-divider grid-cols-[1fr_auto]"
+            >
+                <input
+                    class="p-2 outline-none"
+                    type="text"
+                    placeholder="Type your message"
+                    bind:value={chatInput}
+                    on:keyup={(e) =>
+                        e.key === "Enter" && sendChatMessage()}
+                />
+                <button on:click={sendChatMessage}>Send</button>
+            </div>
+        </div>
+    </section>
+</body>
 
 <style>
-    button.ready {
-        animation: scaleUp 0.2s ease-in-out;
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
     }
 
     @keyframes scaleUp {

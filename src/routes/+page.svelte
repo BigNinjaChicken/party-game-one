@@ -151,11 +151,13 @@
 	</button>
 {:else}
 	<body data-theme="crimson">
-		<AppBar>
-			<svelte:fragment slot="lead">{tabBarPlayerName}</svelte:fragment>
-			<svelte:fragment slot="headline">{tabBarCode}</svelte:fragment>
-			<svelte:fragment slot="trail">{tabBarPlayerScore}</svelte:fragment>
-		</AppBar>
+		{#if stage == 0}
+			<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
+				<svelte:fragment slot="lead">{tabBarPlayerName}</svelte:fragment>
+				<p>{tabBarCode}</p>
+				<svelte:fragment slot="trail">{tabBarPlayerScore}</svelte:fragment>
+			</AppBar>
+		{/if}
 	</body>
 	<svelte:component
 		this={componentList[stage - 1]}
