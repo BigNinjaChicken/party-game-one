@@ -167,7 +167,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="text-red-400">{partner} is writing here...</div>
+                                    <div class="text-red-400 text-3xl">{partner} is writing here...</div>
                                 {/if}
                             </div>
                             <h1 class="my-3 text-lg font-bold text-black">
@@ -190,7 +190,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="text-red-400">{partner} is writing here...</div>
+                                    <div class="text-red-400 text-3xl">{partner} is writing here...</div>
                                 {/if}
                             </div>
                         {:else}
@@ -215,7 +215,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="text-red-400">{partner} is writing here...</div>
+                                    <div class="text-red-400 text-3xl">{partner} is writing here...</div>
                                 {/if}
                             </div>
                             <h1 class="my-3 text-lg font-bold text-black">
@@ -238,7 +238,7 @@
                                         </button>
                                     </div>
                                 {:else}
-                                    <div class="text-red-400">{partner} is writing here...</div>
+                                    <div class="text-red-400 text-3xl">{partner} is writing here...</div>
                                 {/if}
                             </div>
                         {/if}
