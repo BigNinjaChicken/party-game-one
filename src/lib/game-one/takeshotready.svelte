@@ -33,29 +33,37 @@
     }
 </script>
 
-{#if bShowReadyScreen}
-<section class="hero is-primary is-fullheight">
-    <div class="hero-body">
-        <div class="container has-text-centered">
-            <h1 class="title is-size-1">Time to take a shot!</h1>
-            <p class="subtitle is-size-4">You have been given a multiplier but in return you have to take a shot</p>
-            <button
-                class="button is-success is-size-5"
-                on:click={toggleReady}
-                class:ready={bIsReady}
-            >
-                {bIsReady ? "You're Ready!" : "Press me once you have taken your shot"}
-            </button>
-        </div>
-    </div>
-</section>
-{:else}
-<section class="hero is-primary is-fullheight">
-    <div class="hero-body">
-        <div class="container has-text-centered">
-            <h1 class="title is-size-1">Waiting on other players</h1>
-            <p class="subtitle is-size-4">Someone is currently taking a shot. Once they're finished we will resume!</p>
-        </div>
-    </div>
-</section>
-{/if}
+<body data-theme="crimson">
+    {#if bShowReadyScreen}
+        <section class="flex flex-col justify-center items-center h-screen">
+            <div class="max-w-md p-4 rounded shadow-md bg-surface-500 mb-4">
+                <h1 class="text-3xl font-semibold mb-4 text-error-500">
+                    Time to take a shot!
+                </h1>
+                <p class="mb-4 italic">
+                    You have been given a multiplier but in return, you have to
+                    take a shot.
+                </p>
+            </div>
+            <p class="text-lg font-bold mb-0 pb-0">Press once you're ready:</p>
+            <div class="text-center m-3 mt-1">
+                <button
+                    class="btn variant-filled px-8 py-3"
+                    on:click={toggleReady}
+                    class:ready={bIsReady}
+                    >{bIsReady ? "Ready!" : "I've Taken My Shot"}</button
+                >
+            </div>
+        </section>
+    {:else}
+        <section class="flex flex-col justify-center items-center h-screen">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold">Waiting on other players</h1>
+                <p class="mt-4 text-surface-400">
+                    Someone is currently taking a shot. Once they're finished,
+                    we will resume!
+                </p>
+            </div>
+        </section>
+    {/if}
+</body>

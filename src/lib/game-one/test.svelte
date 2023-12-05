@@ -1,136 +1,34 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-
-    let randomName: string;
     export let stage: number;
     export let socket: WebSocket;
     export let receivedData: any;
-    export let tabBarPlayerName: string;
-    export let tabBarCode: string;
-
-    const generateRandomName = () => {
-        const names = ["Frazier", "Tom", "Berk", "Jackson", "Chase", "Davis", "Ethan", "Jelani", "Gus", "Isaac"];
-        const randomIndex = Math.floor(Math.random() * names.length);
-        randomName = names[randomIndex];
-    };
-
-    // Generate a random name when the component loads
-    generateRandomName();
-
-    let joinText: string = "Join";
-    let lobbyCode: string = "";
-    let playerName: string = "";
-    let errorText: string = ""; 
-
-    if (tabBarPlayerName != "" && tabBarCode != "" && lobbyCode == "" && playerName == "") {
-        lobbyCode = tabBarCode;
-        playerName = tabBarPlayerName;
-    }
-
-    async function joinLobby() {
-        // Get the lobbyCode and playerName from the input fields
-        const enteredLobbyCode = lobbyCode.trim();
-        const enteredPlayerName = playerName.trim().toUpperCase();
-
-        // Check if lobbyCode and playerName are not empty
-        if (enteredLobbyCode && enteredPlayerName) {
-            console.log("Lobby Code:", enteredLobbyCode);
-            console.log("Player Name:", enteredPlayerName);
-
-            tabBarPlayerName = enteredPlayerName;
-            tabBarCode = enteredLobbyCode;
-
-            const data = {
-                bJoinGame: true,
-                sessionCode: enteredLobbyCode,
-                playerName: enteredPlayerName,
-            };
-            joinText = "Joining Lobby...";
-        } else {
-            errorText = "Please enter a valid Lobby Code and Player Name";
-            joinText = "Join";
-        }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-        if (event.key === "Enter") {
-            joinLobby();
-        }
-    }
-
-    function convertToUpperCase(event: Event) {
-        const inputElement = event.currentTarget as HTMLInputElement;
-        let value = inputElement.value.toUpperCase();
-
-        // Limit the input to 4 characters
-        if (value.length > 4) {
-            value = value.slice(0, 4);
-        }
-
-        inputElement.value = value;
-    }
-
-    function limitInput(event: Event) {
-        const inputElement = event.currentTarget as HTMLInputElement;
-        let value = inputElement.value;
-        const inputLimit = 18;
-
-        if (value.length > inputLimit) {
-            value = value.slice(0, inputLimit);
-        }
-
-        inputElement.value = value;
-    }
 </script>
 
-<section class="flex justify-center items-center h-screen m-0 bg-gradient-to-br from-blue-500 to-green-400 bg-200% animate-rotateGradient">
-    <div class="text-center bg-surface-600 rounded-md">
-        <div
-            class="p-5 m-10"
-        >
-            <h1 class="text-3xl font-bold">AlcyBox Join Menu</h1>
-            <div class="mb-4">
-                <label class="block text-lg mb-2" for="input1">Lobby Code</label>
-                <input
-                    class="w-full px-3 py-2 input"
-                    type="text"
-                    id="input1"
-                    placeholder="ABCD"
-                    on:keydown={handleKeyDown}
-                    on:input={convertToUpperCase}
-                    bind:value={lobbyCode}
-                />
-            </div>
-            <div class="mb-4">
-                <label class="block text-lg mb-2" for="input2">Name</label>
-                <input
-                    class="w-full px-3 py-2 input"
-                    type="text"
-                    id="input2"
-                    placeholder={randomName}
-                    on:keydown={handleKeyDown}
-                    on:input={limitInput}
-                    bind:value={playerName}
-                />
-            </div>
-            <button
-                class="btn variant-filled-success px-10"
-                on:click={joinLobby}>{joinText}</button
-            >
-            {#if errorText}
-                <p class="text-red-500 p-5">{errorText}</p>
-            {/if}
+<body data-theme="crimson">
+    <section class="flex flex-col justify-center items-center h-screen">
+        <div class="max-w-md p-4 rounded shadow-md bg-surface-500 mb-4">
+            <h1 class="text-3xl font-semibold mb-4 text-error-500">
+                Time to take a shot!
+            </h1>
+            <p class="mb-4 italic">
+                You have been given a multiplier but in return, you have to take
+                a shot.
+            </p>
         </div>
-    </div>
-</section>
-
-<style>
-    @keyframes rotateGradient {
-        0%, 100% { background-position: 0% 0%; }
-        50% { background-position: 100% 100%; }
-    }
-
-    h1 {
-        font-family: "Scrappy", sans-serif;
-    }
-</style>
+        <p class="text-lg font-bold mb-0 pb-0">Press once you're ready:</p>
+        <div class="text-center m-3 mt-1">
+            <button class="btn variant-filled px-8 py-3"
+                >I've Taken My Shot</button
+            >
+        </div>
+    </section>
+    <section class="flex flex-col justify-center items-center h-screen">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold">Waiting on other players</h1>
+            <p class="mt-4 text-surface-400">
+                Someone is currently taking a shot. Once they're finished, we
+                will resume!
+            </p>
+        </div>
+    </section>
+</body>
