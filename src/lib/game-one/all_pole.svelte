@@ -73,7 +73,7 @@
     {#if !bAllSubmitted}
         <main class="section">
             <div class="container">
-                <h1 class="title">Poll Screen</h1>
+                <h1 class="title">Select the best team story:</h1>
                 {#if bUpdate}
                     {#each prompts as prompt, i}
                         <button

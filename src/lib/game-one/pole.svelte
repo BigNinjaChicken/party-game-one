@@ -51,7 +51,7 @@
     >
         <main class="section bg-gray-900 text-white">
             <div class="container mx-auto p-4">
-                <h1 class="text-2xl mb-4 text-white">Poll Screen</h1>
+                <h1 class="text-2xl mb-4 text-white">Select the best responce:</h1>
                 <button
                     class="btn bg-blue-500 text-white py-2 px-4 rounded-full mb-2"
                     class:selected={selectedOption === "Option1"}
