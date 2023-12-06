@@ -20,6 +20,7 @@
             "Jelani",
             "Gus",
             "Isaac",
+            "Max"
         ];
         const randomIndex = Math.floor(Math.random() * names.length);
         randomName = names[randomIndex];
@@ -124,7 +125,7 @@
     >
         <div class="text-center bg-surface-600 rounded-md">
             <div class="p-5 m-10">
-                <h1 class="text-4xl font-bold">AlcyBox Join Menu</h1>
+                <h1 class="text-4xl font-bold">Rounds On Me Join Menu</h1>
                 <div class="mb-4">
                     <label class="block text-lg mb-2" for="input1"
                         >Lobby Code</label
